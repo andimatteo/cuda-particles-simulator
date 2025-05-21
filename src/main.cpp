@@ -27,12 +27,10 @@ int main(int argc, char *argv[]) {
 
         for (int i = 0; i < particleNum; ++i) {
 
-            float a_x  = 0;
-            float a_y = 0;
-            float a_z = 0;
-            oldParticles[i].calcAcceleration(oldParticles, particleNum, a_x, a_y, a_z);
+            double3 acceleration = {0,0,0};
+            oldParticles[i].calcAcceleration(oldParticles, particleNum, acceleration);
 
-            oldParticles[i].newState(particles[i], a_x, a_y, a_z);
+            oldParticles[i].newState(particles[i], acceleration);
 
         }
 
