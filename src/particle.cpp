@@ -12,9 +12,9 @@ void particle::calcAcceleration(const particle* const particles, const int parti
 
         if (dist <= DIST_THRESHOLD) continue;
 
-        a_x += G * particles[i].mass * this->mass * (particles[i].x - this->x) / (dist*dist*dist);
-        a_y += G * particles[i].mass * this->mass * (particles[i].y - this->y) / (dist*dist*dist);
-        a_z += G * particles[i].mass * this->mass * (particles[i].z - this->z) / (dist*dist*dist);
+        a_x += G * particles[i].mass * (particles[i].x - this->x) / (dist*dist*dist);
+        a_y += G * particles[i].mass * (particles[i].y - this->y) / (dist*dist*dist);
+        a_z += G * particles[i].mass * (particles[i].z - this->z) / (dist*dist*dist);
 
     }
 
