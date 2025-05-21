@@ -9,19 +9,20 @@
 #include <cmath>
 using namespace std;
 
+
+struct double3{
+    double x,y,z;
+};
+
 class particle {
 public:
-    float x;
-    float y;
-    float z;
-    float v_x;
-    float v_y;
-    float v_z;
-    float mass;
+    double3 position;
+    double3 velocity;
+    double mass;
 
-    void calcAcceleration(const particle* const particles, const int particleNum, float& a_x, float& a_y, float& a_z) const;
+    void calcAcceleration(const particle* const particles, const int particleNum, double3& acceleration) const;
 
-    void newState(particle& target, float a_x, float a_y, float a_z) const;
+    void newState(particle& target, double3 acceleration) const;
 };
 
 istream& operator>> (istream& is, particle& particle);

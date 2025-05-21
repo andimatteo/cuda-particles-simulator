@@ -1,45 +1,45 @@
 #include "particle.h"
 
-void particle::calcAcceleration(const particle* const particles, const int particleNum, float& a_x, float& a_y, float& a_z) const {
+void particle::calcAcceleration(const particle* const particles, const int particleNum, double3& acceleration) const {
 
     for (int i = 0; i < particleNum; ++i) {
 
         float dist = sqrt(
-                (particles[i].x - this->x) * (particles[i].x - this->x) +
-                (particles[i].y - this->y) * (particles[i].y - this->y) +
-                (particles[i].z - this->z) * (particles[i].z - this->z)
+                (particles[i].position.x - this->position.x) * (particles[i].position.x - this->position.x) +
+                (particles[i].position.y - this->position.y) * (particles[i].position.y - this->position.y) +
+                (particles[i].position.z - this->position.z) * (particles[i].position.z - this->position.z)
             );
 
         if (dist <= DIST_THRESHOLD) continue;
 
-        a_x += G * particles[i].mass * (particles[i].x - this->x) / (dist*dist*dist);
-        a_y += G * particles[i].mass * (particles[i].y - this->y) / (dist*dist*dist);
-        a_z += G * particles[i].mass * (particles[i].z - this->z) / (dist*dist*dist);
+        acceleration.x += G * particles[i].mass * (particles[i].position.x - this->position.x) / (dist*dist*dist);
+        acceleration.y += G * particles[i].mass * (particles[i].position.y - this->position.y) / (dist*dist*dist);
+        acceleration.z += G * particles[i].mass * (particles[i].position.z - this->position.z) / (dist*dist*dist);
 
     }
 
 }
 
-void particle::newState(particle& target, float a_x, float a_y, float a_z) const {
+void particle::newState(particle& target, double3 acceleration) const {
 
-    target.x = this->x + this->v_x * STEP_TIME + 0.5f * a_x * STEP_TIME * STEP_TIME;
-    target.y = this->y + this->v_y * STEP_TIME + 0.5f * a_y * STEP_TIME * STEP_TIME;
-    target.z = this->z + this->v_z * STEP_TIME + 0.5f * a_z * STEP_TIME * STEP_TIME;
+    target.position.x = this->position.x + this->velocity.x * STEP_TIME + 0.5 * acceleration.x * STEP_TIME * STEP_TIME;
+    target.position.y = this->position.y + this->velocity.y * STEP_TIME + 0.5 * acceleration.y * STEP_TIME * STEP_TIME;
+    target.position.z = this->position.z + this->velocity.z * STEP_TIME + 0.5 * acceleration.z * STEP_TIME * STEP_TIME;
 
-    target.v_x = this->v_x + a_x * STEP_TIME;
-    target.v_y = this->v_y + a_y * STEP_TIME;
-    target.v_z = this->v_z + a_z * STEP_TIME;
-
+    target.velocity.x = this->velocity.x + acceleration.x * STEP_TIME;
+    target.velocity.y = this->velocity.y + acceleration.y * STEP_TIME;
+    target.velocity.z = this->velocity.z + acceleration.z * STEP_TIME;
+    
 }
 
 istream& operator>> (istream& is, particle& particle)
 {
-    is  >> particle.x
-        >> particle.y
-        >> particle.z
-        >> particle.v_x
-        >> particle.v_y
-        >> particle.v_z
+    is  >> particle.position.x
+        >> particle.position.y
+        >> particle.position.z
+        >> particle.velocity.x
+        >> particle.velocity.y
+        >> particle.velocity.z
         >> particle.mass;
 
     return is;
@@ -47,13 +47,14 @@ istream& operator>> (istream& is, particle& particle)
 
 ostream& operator<< (ostream& os, const particle& particle)
 {
-    os  << particle.x << " "
-        << particle.y << " "
-        << particle.z << " "
-        << particle.v_x << " "
-        << particle.v_y << " "
-        << particle.v_z << " "
+    os  << particle.position.x << " "
+        << particle.position.y << " "
+        << particle.position.z << " "
+        << particle.velocity.x << " "
+        << particle.velocity.y << " "
+        << particle.velocity.z << " "
         << particle.mass;
 
     return os;
 }
+
