@@ -14,6 +14,8 @@
         - come sono ripartiti: p1:t1, p2:t1, ..., p(k/n):tn, p((k+1)/n):t2, ...
 
 ## todo
-- [] --> dimensionare file di carico in base alle dimensioni delle cache e verificare comportamento
-- [] --> fare una coda di thread per bilanciare il carico tra thread
-- [] --> portare su GPU
+- [ ] --> dimensionare file di carico in base alle dimensioni delle cache e verificare comportamento
+- [ ] --> fare una coda di thread per bilanciare il carico tra thread
+- [ ] --> portare su GPU
+- [ ] --> far vedere con il profiler che batch non cambia all'aumentare del numero di thread
+- [ ] --> fare refactoring 1. seriale, 2. parallelo (+thread affinity), 3. batch
