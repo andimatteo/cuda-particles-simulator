@@ -23,8 +23,15 @@ public:
     void start_simulation();  
 };
 
+class parallelSimulation : public simulation {
+public:
+    parallelSimulation(int duration, int particleNum) : simulation(duration, particleNum) {}
+    void start_simulation();
+};
+
 class chunkSimulation : public simulation {
 public:
     chunkSimulation(int duration, int particleNum) : simulation(duration, particleNum) {}
     void start_simulation();
 };
+

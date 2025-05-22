@@ -24,6 +24,17 @@ debug: clean $(TARGET)
 clean:
 	rm -f $(OBJECTS) $(TARGET)
 
-run: all
+test: all
 	./$(TARGET) 0 < low.txt > output.txt
+
+sequential: all
+	./$(TARGET) 0 < high.txt > output.txt
+
+parallel: all
+	./$(TARGET) 1 < high.txt > output.txt
+
+chunk: all
+	./$(TARGET) 2 < high.txt > output.txt
+
+
 

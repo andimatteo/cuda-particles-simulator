@@ -21,6 +21,9 @@ int main(int, char *argv[]) {
             Sim = new sequentialSimulation(duration, particleNum);
             break;
         case (1):
+            Sim = new parallelSimulation(duration, particleNum);
+            break;
+        case (2):
             Sim = new chunkSimulation(duration, particleNum);
             break;
     }

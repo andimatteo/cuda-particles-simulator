@@ -1,4 +1,5 @@
 #include "simulation.h"
+#include <omp.h>
 
 simulation::simulation(int duration, int particleNum){
     this->particleNum = particleNum;
@@ -25,8 +26,6 @@ void sequentialSimulation::start_simulation(){
             double3 acceleration = {0,0,0};
             oldParticles[i].calcAcceleration(oldParticles, particleNum, acceleration);
             oldParticles[i].newState(particles[i], acceleration);
-
-
         }
 #ifdef DEBUG
         for (int i = 0; i < particleNum; ++i){
@@ -38,21 +37,28 @@ void sequentialSimulation::start_simulation(){
 }
 
 
-void chunkSimulation::start_simulation(){
-    for (int t = 0; t < duration; ++t){
-        # pragma omp parallel for num_threads(8) schedule(static) shared(particles, oldParticles)
-        for (int i = 0; i < particleNum; ++i){
-            double3 acceleration = {0,0,0};
-            oldParticles[i].calcAcceleration(oldParticles, particleNum, acceleration);
-            oldParticles[i].newState(particles[i], acceleration);
-
-            #ifdef DEBUG
+void parallelSimulation::start_simulation(){
+    # pragma omp parallel num_threads(8) proc_bind(close) shared(particles, oldParticles, particleNum, duration)
+    {
+        for (int t = 0; t < duration; ++t){
+            # pragma omp for schedule(static)        
+            for (int i = 0; i < particleNum; ++i){
+                double3 acceleration = {0,0,0};
+                oldParticles[i].calcAcceleration(oldParticles, particleNum, acceleration);
+                oldParticles[i].newState(particles[i], acceleration);
+            }
+#ifdef DEBUG
             for (int i = 0; i < particleNum; ++i){
                 cout << particles[i] << endl;
             }
             cout << endl;
-            #endif
-
+#endif
         }
     }
 }
+
+void chunkSimulation::start_simulation(){
+
+
+}
+
