@@ -1,7 +1,6 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -O3 -std=c++17
-DEBUG_FLAGS = -Wall -Wextra -O3 -std=c++17 -DDEBUG
-LDFLAGS = -fopenmp
+CXXFLAGS = -Wall -Wextra -O3 -std=c++17 -fopenmp
+DEBUG_FLAGS = -Wall -Wextra -O3 -std=c++17 -DDEBUG -fopenmp
 
 SRC_DIR = src
 SOURCES = $(wildcard $(SRC_DIR)/*.cpp)

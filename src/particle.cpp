@@ -2,7 +2,6 @@
 
 void particle::calcAcceleration(const particle* const particles, const int particleNum, double3& acceleration) const {
     
-    #pragma omp parallel for schedule(static) shared(particles) num_thread(4)
     for (int i = 0; i < particleNum; ++i) {
 
         float dist = sqrt(

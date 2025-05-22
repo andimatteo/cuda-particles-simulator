@@ -26,14 +26,14 @@ void sequentialSimulation::start_simulation(){
             oldParticles[i].calcAcceleration(oldParticles, particleNum, acceleration);
             oldParticles[i].newState(particles[i], acceleration);
 
-            #ifdef DEBUG
-            for (int i = 0; i < particleNum; ++i){
-                cout << particles[i] << endl;
-            }
-            cout << endl;
-            #endif
 
         }
+#ifdef DEBUG
+        for (int i = 0; i < particleNum; ++i){
+            cout << particles[i] << endl;
+        }
+        cout << endl;
+#endif
     }
 }
 
