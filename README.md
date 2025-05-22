@@ -4,6 +4,11 @@
 2. compilazione senza output `make`
 3. esecuzione test `make run`
 
+## generare un file di config
+- dentro `utils/` e' presente uno script python per generare un file di config
+- si lancia con il seguente comando:
+    - `python generate_config.py --epochs 10 --particles 1000 --output my_config.txt`
+
 ## eseguire l'applicazione
 - una volta compilato, lanciare il comando ./main [option] < input.txt > output.txt.
 - le possibili option per il momento sono:
