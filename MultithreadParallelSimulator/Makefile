@@ -35,6 +35,3 @@ parallel: all
 
 chunk: all
 	./$(TARGET) 2 < high.txt > output.txt
-
-
-
