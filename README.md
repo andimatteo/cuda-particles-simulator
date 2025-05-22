@@ -18,5 +18,4 @@
 - [ ] --> fare una coda di thread per bilanciare il carico tra thread
 - [ ] --> portare su GPU
 - [ ] --> far vedere con il profiler che batch non cambia all'aumentare del numero di thread
-- [ ] --> fare refactoring 1. seriale, 2. parallelo (+thread affinity), 3. batch
-- [ ] --> portare fuori loop calcolo accelerazioni
+- [x] --> fare refactoring 1. seriale, 2. parallelo (+thread affinity), 3. batch
