@@ -1,9 +1,9 @@
 #ifndef CODICE_PARTICLE_H
 #define CODICE_PARTICLE_H
 
-#define G 1.0f
-#define STEP_TIME 1.0f
-#define DIST_THRESHOLD 0.1f
+#define G 1.0
+#define STEP_TIME 1.0
+#define DIST_THRESHOLD 0.1
 
 #include <fstream>
 #include <cmath>
@@ -20,7 +20,7 @@ public:
     double3 velocity;
     double mass;
 
-    void calcAcceleration(const particle* const particles, const int particleNum, double3& acceleration) const;
+    void calcAcceleration(const particle particle, double3& acceleration) const;
 
     void newState(particle& target, double3 acceleration) const;
 };

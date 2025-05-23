@@ -24,7 +24,10 @@ void sequentialSimulation::start_simulation(){
     for (int t = 0; t < duration; ++t){
         for (int i = 0; i < particleNum; ++i){
             double3 acceleration = {0,0,0};
-            oldParticles[i].calcAcceleration(oldParticles, particleNum, acceleration);
+            for (int j = 0; j < particleNum; ++j) {
+                if (i != j) [[likely]]
+                            oldParticles[i].calcAcceleration(oldParticles[j], acceleration);
+            }
             oldParticles[i].newState(particles[i], acceleration);
         }
 #ifdef DEBUG
@@ -38,13 +41,16 @@ void sequentialSimulation::start_simulation(){
 
 
 void parallelSimulation::start_simulation(){
-    # pragma omp parallel num_threads(8) proc_bind(close) shared(particles, oldParticles, particleNum, duration)
+    # pragma omp parallel num_threads(THREAD_NUM) proc_bind(close) shared(particles, oldParticles, particleNum, duration)
     {
         for (int t = 0; t < duration; ++t){
             # pragma omp for schedule(static)        
             for (int i = 0; i < particleNum; ++i){
                 double3 acceleration = {0,0,0};
-                oldParticles[i].calcAcceleration(oldParticles, particleNum, acceleration);
+                for (int j = 0; j < particleNum; ++j) {
+                    if (i != j) [[likely]]
+                        oldParticles[i].calcAcceleration(oldParticles[j], acceleration);
+                }
                 oldParticles[i].newState(particles[i], acceleration);
             }
 #ifdef DEBUG
@@ -58,7 +64,36 @@ void parallelSimulation::start_simulation(){
 }
 
 void chunkSimulation::start_simulation(){
+    # pragma omp parallel num_threads(THREAD_NUM) proc_bind(close) shared(particles, oldParticles, particleNum, duration)
+    {
+        for (int t = 0; t < duration; ++t){
+            # pragma omp for schedule(static)
+            for (int i = 0; i < particleNum; i += CHUNK_SIZE){
+                double3 acceleration[CHUNK_SIZE];
+                for (int k = 0; (k < CHUNK_SIZE) && (i + k < particleNum); ++k) {
+                    acceleration[k].x = 0;
+                    acceleration[k].y = 0;
+                    acceleration[k].z = 0;
+                }
 
+                for (int j = 0; j < particleNum; ++j) {
+                    for (int k = 0; (k < CHUNK_SIZE) && (i + k < particleNum); ++k) {
+                        if (i + k != j) [[likely]]
+                            oldParticles[i+k].calcAcceleration(oldParticles[j], acceleration[k]);
+                    }
+                }
 
+                for (int k = 0; (k < CHUNK_SIZE) && (i + k < particleNum); ++k) {
+                    oldParticles[i+k].newState(particles[i+k], acceleration[k]);
+                }
+            }
+#ifdef DEBUG
+            for (int i = 0; i < particleNum; ++i){
+                cout << particles[i] << endl;
+            }
+            cout << endl;
+#endif
+        }
+    }
 }
 

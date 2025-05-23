@@ -26,6 +26,8 @@ int main(int, char *argv[]) {
         case (2):
             Sim = new chunkSimulation(duration, particleNum);
             break;
+        default:
+            return 1;
     }
 
     Sim->load_particles();
