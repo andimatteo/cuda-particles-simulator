@@ -1,22 +1,18 @@
 #include "particle.h"
 
-void particle::calcAcceleration(const particle* const particles, const int particleNum, double3& acceleration) const {
-    
-    for (int i = 0; i < particleNum; ++i) {
+void particle::calcAcceleration(const particle particle, double3& acceleration) const {
 
-        float dist = sqrt(
-                (particles[i].position.x - this->position.x) * (particles[i].position.x - this->position.x) +
-                (particles[i].position.y - this->position.y) * (particles[i].position.y - this->position.y) +
-                (particles[i].position.z - this->position.z) * (particles[i].position.z - this->position.z)
-            );
+    float dist = sqrt(
+            (particle.position.x - this->position.x) * (particle.position.x - this->position.x) +
+            (particle.position.y - this->position.y) * (particle.position.y - this->position.y) +
+            (particle.position.z - this->position.z) * (particle.position.z - this->position.z)
+        );
 
-        if (dist <= DIST_THRESHOLD) continue;
+    if (dist <= DIST_THRESHOLD) [[unlikely]] return;
 
-        acceleration.x += G * particles[i].mass * (particles[i].position.x - this->position.x) / (dist*dist*dist);
-        acceleration.y += G * particles[i].mass * (particles[i].position.y - this->position.y) / (dist*dist*dist);
-        acceleration.z += G * particles[i].mass * (particles[i].position.z - this->position.z) / (dist*dist*dist);
-
-    }
+    acceleration.x += G * particle.mass * (particle.position.x - this->position.x) / (dist*dist*dist);
+    acceleration.y += G * particle.mass * (particle.position.y - this->position.y) / (dist*dist*dist);
+    acceleration.z += G * particle.mass * (particle.position.z - this->position.z) / (dist*dist*dist);
 
 }
 

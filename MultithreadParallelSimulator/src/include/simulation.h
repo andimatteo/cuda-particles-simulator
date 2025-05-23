@@ -1,5 +1,9 @@
 #include "particle.h"
 #include <iostream>
+
+#define THREAD_NUM 8
+#define CHUNK_SIZE 2048
+
 using namespace std;
 
 class simulation{
