@@ -4,7 +4,6 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <iostream>
-#include <cstdint>
 #include <cstdlib>
 
 #ifndef PARTICLE_NUM
@@ -25,15 +24,16 @@ int main(int argc, char** argv) {
     // TODO: manage arguments
 
     // host memory
-    float64_t *h_masses = (float64_t*) malloc(PARTICLE_NUM * sizeof(float64_t));
+    double *h_masses = (double*) malloc(PARTICLE_NUM * sizeof(double));
 
-    float64_t *h_x_pos = (float64_t*) malloc(PARTICLE_NUM * sizeof(float64_t));
-    float64_t *h_y_pos = (float64_t*) malloc(PARTICLE_NUM * sizeof(float64_t));
-    float64_t *h_z_pos = (float64_t*) malloc(PARTICLE_NUM * sizeof(float64_t));
+    // TODO: use float3
+    double *h_x_pos = (double*) malloc(PARTICLE_NUM * sizeof(double));
+    double *h_y_pos = (double*) malloc(PARTICLE_NUM * sizeof(double));
+    double *h_z_pos = (double*) malloc(PARTICLE_NUM * sizeof(double));
 
-    float64_t *h_x_vel = (float64_t*) malloc(PARTICLE_NUM * sizeof(float64_t));
-    float64_t *h_y_vel = (float64_t*) malloc(PARTICLE_NUM * sizeof(float64_t));
-    float64_t *h_z_vel = (float64_t*) malloc(PARTICLE_NUM * sizeof(float64_t));
+    double *h_x_vel = (double*) malloc(PARTICLE_NUM * sizeof(double));
+    double *h_y_vel = (double*) malloc(PARTICLE_NUM * sizeof(double));
+    double *h_z_vel = (double*) malloc(PARTICLE_NUM * sizeof(double));
 
 
     // initialize host memory
@@ -42,37 +42,37 @@ int main(int argc, char** argv) {
     cin >> unused;
 
     for (int i = 0; i < PARTICLE_NUM; i++) {
-        cin >> h_masses[i] 
-            >> h_x_pos[i] >> h_y_pos[i] >> h_z_pos[i]
-            >> h_x_vel[i] >> h_y_vel[i] >> h_z_vel[i];
+        cin >> h_x_pos[i] >> h_y_pos[i] >> h_z_pos[i]
+            >> h_x_vel[i] >> h_y_vel[i] >> h_z_vel[i]
+            >> h_masses[i];
     }
 
     // allocate and initialize device memory
     // TODO: declare __constant__
-    float64_t *d_masses = allocateAndCopy<float64_t>(h_masses, PARTICLE_NUM);
+    double *d_masses = allocateAndCopy(h_masses, PARTICLE_NUM);
 
-    float64_t *d_x_pos_old = allocateAndCopy<float64_t>(h_x_pos, PARTICLE_NUM);
-    float64_t *d_y_pos_old = allocateAndCopy<float64_t>(h_y_pos, PARTICLE_NUM);
-    float64_t *d_z_pos_old = allocateAndCopy<float64_t>(h_z_pos, PARTICLE_NUM);
+    double *d_x_pos_old = allocateAndCopy(h_x_pos, PARTICLE_NUM);
+    double *d_y_pos_old = allocateAndCopy(h_y_pos, PARTICLE_NUM);
+    double *d_z_pos_old = allocateAndCopy(h_z_pos, PARTICLE_NUM);
 
-    float64_t *d_x_vel_old = allocateAndCopy<float64_t>(h_x_vel, PARTICLE_NUM); 
-    float64_t *d_y_vel_old = allocateAndCopy<float64_t>(h_y_vel, PARTICLE_NUM);
-    float64_t *d_z_vel_old = allocateAndCopy<float64_t>(h_z_vel, PARTICLE_NUM);
+    double *d_x_vel_old = allocateAndCopy(h_x_vel, PARTICLE_NUM); 
+    double *d_y_vel_old = allocateAndCopy(h_y_vel, PARTICLE_NUM);
+    double *d_z_vel_old = allocateAndCopy(h_z_vel, PARTICLE_NUM);
 
-    float64_t *d_x_pos_new = allocateAndNull<float64_t>(PARTICLE_NUM);
-    float64_t *d_y_pos_new = allocateAndNull<float64_t>(PARTICLE_NUM);
-    float64_t *d_z_pos_new = allocateAndNull<float64_t>(PARTICLE_NUM);
+    double *d_x_pos_new = allocateAndNull(PARTICLE_NUM);
+    double *d_y_pos_new = allocateAndNull(PARTICLE_NUM);
+    double *d_z_pos_new = allocateAndNull(PARTICLE_NUM);
 
-    float64_t *d_x_vel_new = allocateAndNull<float64_t>(PARTICLE_NUM); 
-    float64_t *d_y_vel_new = allocateAndNull<float64_t>(PARTICLE_NUM);
-    float64_t *d_z_vel_new = allocateAndNull<float64_t>(PARTICLE_NUM);
+    double *d_x_vel_new = allocateAndNull(PARTICLE_NUM); 
+    double *d_y_vel_new = allocateAndNull(PARTICLE_NUM);
+    double *d_z_vel_new = allocateAndNull(PARTICLE_NUM);
 
-    float64_t *d_x_acc = allocateAndNull<float64_t>(PARTICLE_NUM);
-    float64_t *d_y_acc = allocateAndNull<float64_t>(PARTICLE_NUM);
-    float64_t *d_z_acc = allocateAndNull<float64_t>(PARTICLE_NUM);
+    double *d_x_acc = allocateAndNull(PARTICLE_NUM);
+    double *d_y_acc = allocateAndNull(PARTICLE_NUM);
+    double *d_z_acc = allocateAndNull(PARTICLE_NUM);
 
     // copy masses from host to device
-    cudaError_t result = cudaMemcpy(d_masses, h_masses, sizeof(float64_t) * PARTICLE_NUM,
+    cudaError_t result = cudaMemcpy(d_masses, h_masses, sizeof(double) * PARTICLE_NUM,
         cudaMemcpyHostToDevice);
     if (result != cudaSuccess) {
         cerr << "Could not copy the masses array to the device \n";
@@ -80,42 +80,42 @@ int main(int argc, char** argv) {
     }
 
     // copy positions and velocities from host to device
-    result = cudaMemcpy(d_x_pos_old, h_x_pos, sizeof(float64_t) * PARTICLE_NUM,
+    result = cudaMemcpy(d_x_pos_old, h_x_pos, sizeof(double) * PARTICLE_NUM,
         cudaMemcpyHostToDevice);
     if (result != cudaSuccess) {
         cerr << "Could not copy the x_pos array to the device \n";
         return 0;
     }
 
-    result = cudaMemcpy(d_y_pos_old, h_y_pos, sizeof(float64_t) * PARTICLE_NUM,
+    result = cudaMemcpy(d_y_pos_old, h_y_pos, sizeof(double) * PARTICLE_NUM,
     cudaMemcpyHostToDevice);
     if (result != cudaSuccess) {
         cerr << "Could not copy the y_pos array to the device \n";
         return 0;
     }
 
-    result = cudaMemcpy(d_z_pos_old, h_z_pos, sizeof(float64_t) * PARTICLE_NUM,
+    result = cudaMemcpy(d_z_pos_old, h_z_pos, sizeof(double) * PARTICLE_NUM,
     cudaMemcpyHostToDevice);
     if (result != cudaSuccess) {
         cerr << "Could not copy the z_pos array to the device \n";
         return 0;
     }
 
-    result = cudaMemcpy(d_x_vel_old, h_x_vel, sizeof(float64_t) * PARTICLE_NUM,
+    result = cudaMemcpy(d_x_vel_old, h_x_vel, sizeof(double) * PARTICLE_NUM,
     cudaMemcpyHostToDevice);
     if (result != cudaSuccess) {
         cerr << "Could not copy the x_vel array to the device \n";
         return 0;
     }
 
-    result = cudaMemcpy(d_y_vel_old, h_y_vel, sizeof(float64_t) * PARTICLE_NUM,
+    result = cudaMemcpy(d_y_vel_old, h_y_vel, sizeof(double) * PARTICLE_NUM,
     cudaMemcpyHostToDevice);
     if (result != cudaSuccess) {
         cerr << "Could not copy the y_vel array to the device \n";
         return 0;
     }
 
-    result = cudaMemcpy(d_z_vel_old, h_z_vel, sizeof(float64_t) * PARTICLE_NUM,
+    result = cudaMemcpy(d_z_vel_old, h_z_vel, sizeof(double) * PARTICLE_NUM,
     cudaMemcpyHostToDevice);
     if (result != cudaSuccess) {
         cerr << "Could not copy the z_vel array to the device \n";
@@ -146,19 +146,19 @@ int main(int argc, char** argv) {
         );
 
         // log results
-        result = cudaMemcpy(h_x_pos, d_x_pos_new, sizeof(float64_t) * PARTICLE_NUM,
+        result = cudaMemcpy(h_x_pos, d_x_pos_new, sizeof(double) * PARTICLE_NUM,
             cudaMemcpyDeviceToHost);
         if (result != cudaSuccess) {
             cerr << "Could not copy the x_pos array to the host \n";
             return 0;
         }
-        result = cudaMemcpy(h_y_pos, d_y_pos_new, sizeof(float64_t) * PARTICLE_NUM,
+        result = cudaMemcpy(h_y_pos, d_y_pos_new, sizeof(double) * PARTICLE_NUM,
             cudaMemcpyDeviceToHost);
         if (result != cudaSuccess) {
             cerr << "Could not copy the y_pos array to the host \n";
             return 0;
         }
-        result = cudaMemcpy(h_z_pos, d_z_pos_new, sizeof(float64_t) * PARTICLE_NUM,
+        result = cudaMemcpy(h_z_pos, d_z_pos_new, sizeof(double) * PARTICLE_NUM,
             cudaMemcpyDeviceToHost);
         if (result != cudaSuccess) {
             cerr << "Could not copy the z_pos array to the host \n";

@@ -3,14 +3,10 @@
 
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include <cstdint>
+#include <iostream>
 
 using namespace std;
-
-template <typename T>
-T* allocateAndCopy(T* array, int length);
-
-template <typename T>
-T* allocateAndNull(int length);
+double* allocateAndCopy(double* array, int length);
+double* allocateAndNull(int length);
 
 #endif

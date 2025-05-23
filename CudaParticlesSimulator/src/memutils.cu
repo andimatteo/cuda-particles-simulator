@@ -1,31 +1,31 @@
 #include "memutils.cuh"
 
-T* allocateAndCopy<T>(T* array, int length) {
-	T* dev_array;
-	cudaError_t result = cudaMalloc((void**)&dev_array, length * sizeof(T));
+double* allocateAndCopy(double* array, int length) {
+	double* dev_array;
+	cudaError_t result = cudaMalloc((void**)&dev_array, length * sizeof(double));
 	if (result != cudaSuccess) {
-        cerr << "Could not allocate the " << typeid(T).name() << " array \n";
+        cerr << "Could not allocate the double array \n";
 		return 0;
 	}
-	result = cudaMemcpy(dev_array, array, sizeof(T) * length,
+	result = cudaMemcpy(dev_array, array, sizeof(double) * length,
 		cudaMemcpyHostToDevice);
 	if (result != cudaSuccess) {
-		cerr << "Could not copy the " << typeid(T).name() << " array to the device \n";
+		cerr << "Could not copy the double array to the device \n";
 		return 0;
 	}
 	return dev_array;
 }
 
-T* allocateAndNull<T>(int length) {
-    T* dev_array;
-    cudaError_t result = cudaMalloc((void**)&dev_array, length * sizeof(T));
+double* allocateAndNull(int length) {
+    double* dev_array;
+    cudaError_t result = cudaMalloc((void**)&dev_array, length * sizeof(double));
     if (result != cudaSuccess) {
-        cerr << "Could not allocate the " << typeid(T).name() << " array \n";
+        cerr << "Could not allocate the double array \n";
         return 0;
     }
-    result = cudaMemset(dev_array, 0, sizeof(T) * length);
+    result = cudaMemset(dev_array, 0, sizeof(double) * length);
     if (result != cudaSuccess) {
-        cerr << "Could not set the " << typeid(T).name() << " array to zero \n";
+        cerr << "Could not set the double array to zero \n";
         return 0;
     }
     return dev_array;

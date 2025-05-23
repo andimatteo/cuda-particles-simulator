@@ -5,22 +5,22 @@
 
 __global__ void newState(
     const uint64_t particleNum,
-    const float64_t* masses,
-    const float64_t* x_pos_old,
-    const float64_t* y_pos_old,
-    const float64_t* z_pos_old,
-    const float64_t* x_vel_old,
-    const float64_t* y_vel_old,
-    const float64_t* z_vel_old,
-    float64_t* x_pos_new,
-    float64_t* y_pos_new,
-    float64_t* z_pos_new,
-    float64_t* x_vel_new,
-    float64_t* y_vel_new,
-    float64_t* z_vel_new,
-    float64_t* x_acc,
-    float64_t* y_acc,
-    float64_t* z_acc
+    const double* masses,
+    const double* x_pos_old,
+    const double* y_pos_old,
+    const double* z_pos_old,
+    const double* x_vel_old,
+    const double* y_vel_old,
+    const double* z_vel_old,
+    double* x_pos_new,
+    double* y_pos_new,
+    double* z_pos_new,
+    double* x_vel_new,
+    double* y_vel_new,
+    double* z_vel_new,
+    double* x_acc,
+    double* y_acc,
+    double* z_acc
 );
 
 #endif

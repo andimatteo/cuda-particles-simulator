@@ -14,22 +14,22 @@
 
 __global__ void newState(
     const uint64_t particleNum,
-    const float64_t* masses,
-    const float64_t* x_pos_old,
-    const float64_t* y_pos_old,
-    const float64_t* z_pos_old,
-    const float64_t* x_vel_old,
-    const float64_t* y_vel_old,
-    const float64_t* z_vel_old,
-    float64_t* x_pos_new,
-    float64_t* y_pos_new,
-    float64_t* z_pos_new,
-    float64_t* x_vel_new,
-    float64_t* y_vel_new,
-    float64_t* z_vel_new,
-    float64_t* x_acc,
-    float64_t* y_acc,
-    float64_t* z_acc
+    const double* masses,
+    const double* x_pos_old,
+    const double* y_pos_old,
+    const double* z_pos_old,
+    const double* x_vel_old,
+    const double* y_vel_old,
+    const double* z_vel_old,
+    double* x_pos_new,
+    double* y_pos_new,
+    double* z_pos_new,
+    double* x_vel_new,
+    double* y_vel_new,
+    double* z_vel_new,
+    double* x_acc,
+    double* y_acc,
+    double* z_acc
 ) {
 
     // calculate the index of the current thread
@@ -44,16 +44,16 @@ __global__ void newState(
     // cycle through all other particles
     for (uint64_t particle = 0; particle < particleNum; particle++) {
         if (idx != particle) {
-            float64_t dx = x_pos_old[particle] - x_pos_old[idx];
-            float64_t dy = y_pos_old[particle] - y_pos_old[idx];
-            float64_t dz = z_pos_old[particle] - z_pos_old[idx];
+            double dx = x_pos_old[particle] - x_pos_old[idx];
+            double dy = y_pos_old[particle] - y_pos_old[idx];
+            double dz = z_pos_old[particle] - z_pos_old[idx];
 
-            float64_t dist = sqrt(dx * dx + dy * dy + dz * dz + EPS * EPS);
+            double dist = sqrt(dx * dx + dy * dy + dz * dz + EPS * EPS);
             
-            float64_t force = G * masses[particle] / (dist * dist);
-            x_acc[idx] += force * dx / dist;
-            y_acc[idx] += force * dy / dist;
-            z_acc[idx] += force * dz / dist;
+            double acc = G * masses[particle] / (dist * dist);
+            x_acc[idx] += acc * dx / dist;
+            y_acc[idx] += acc * dy / dist;
+            z_acc[idx] += acc * dz / dist;
         }
     }
 
