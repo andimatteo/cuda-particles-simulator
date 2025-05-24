@@ -8,8 +8,8 @@
     #define G 6.674e-11
 #endif
 
-#ifndef STEP
-    #define STEP 0.01
+#ifndef STEP_TIME
+    #define STEP_TIME 0.01
 #endif
 
 __global__ void newState(
@@ -58,11 +58,11 @@ __global__ void newState(
     }
 
     // update the velocity and position of the current particle
-    x_vel_new[idx] = x_vel_old[idx] + x_acc[idx] * STEP;
-    y_vel_new[idx] = y_vel_old[idx] + y_acc[idx] * STEP;
-    z_vel_new[idx] = z_vel_old[idx] + z_acc[idx] * STEP;
+    x_vel_new[idx] = x_vel_old[idx] + x_acc[idx] * STEP_TIME;
+    y_vel_new[idx] = y_vel_old[idx] + y_acc[idx] * STEP_TIME;
+    z_vel_new[idx] = z_vel_old[idx] + z_acc[idx] * STEP_TIME;
 
-    x_pos_new[idx] = x_pos_old[idx] + x_vel_new[idx] * STEP + 0.5 * x_acc[idx] * STEP * STEP;
-    y_pos_new[idx] = y_pos_old[idx] + y_vel_new[idx] * STEP + 0.5 * y_acc[idx] * STEP * STEP;
-    z_pos_new[idx] = z_pos_old[idx] + z_vel_new[idx] * STEP + 0.5 * z_acc[idx] * STEP * STEP;
+    x_pos_new[idx] = x_pos_old[idx] + x_vel_new[idx] * STEP_TIME + 0.5 * x_acc[idx] * STEP_TIME * STEP_TIME;
+    y_pos_new[idx] = y_pos_old[idx] + y_vel_new[idx] * STEP_TIME + 0.5 * y_acc[idx] * STEP_TIME * STEP_TIME;
+    z_pos_new[idx] = z_pos_old[idx] + z_vel_new[idx] * STEP_TIME + 0.5 * z_acc[idx] * STEP_TIME * STEP_TIME;
 }

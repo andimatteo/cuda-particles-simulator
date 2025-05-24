@@ -1,9 +1,17 @@
 #ifndef CODICE_PARTICLE_H
 #define CODICE_PARTICLE_H
 
-#define G 1.0
-#define STEP_TIME 1.0
-#define DIST_THRESHOLD 0.1
+#ifndef EPS
+    #define EPS 1e-10
+#endif
+
+#ifndef G
+    #define G 6.674e-11
+#endif
+
+#ifndef STEP_TIME
+    #define STEP_TIME 0.01
+#endif
 
 #include <fstream>
 #include <cmath>

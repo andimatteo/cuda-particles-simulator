@@ -26,3 +26,4 @@
 - [x] --> fare refactoring 1. seriale, 2. parallelo (+thread affinity), 3. batch
 - [ ] --> usare i tipi _t (es. float64_t)
 - [ ] --> TODO in cuda
+- [ ] --> sistemare sincronizzazione thread per la stampa in output.txt

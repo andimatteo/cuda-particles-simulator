@@ -1,7 +1,7 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -O3 -std=c++17 -fopenmp
+CXXFLAGS = -Wall -Wextra -O3 -std=c++17 -fopenmp -DDEBUG
 DEBUG_FLAGS = -Wall -Wextra -O3 -std=c++17 -DDEBUG -fopenmp -g
-LDFLAGS += -Iinclude
+LDFLAGS += -Isrc/include
 
 SRC_DIR = src
 OBJ_DIR = obj

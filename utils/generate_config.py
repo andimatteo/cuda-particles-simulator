@@ -11,9 +11,9 @@ def generate_config_file(filename, num_epochs, num_particles):
 
         # Riga 3+: per ogni particella: posizione x, y, z - velocità x, y, z - massa
         for _ in range(num_particles):
-            position = [random.uniform(-100.0, 100.0) for _ in range(3)]
-            velocity = [random.uniform(-10.0, 10.0) for _ in range(3)]
-            mass = random.uniform(0.1, 100.0)
+            position = [random.uniform(-3e12, 3e12) for _ in range(3)]
+            velocity = [random.uniform(-100000.0, 100000.0) for _ in range(3)]
+            mass = random.uniform(1e6, 1e30)
             values = position + velocity + [mass]
             f.write(" ".join(f"{v:.6f}" for v in values) + "\n")
 

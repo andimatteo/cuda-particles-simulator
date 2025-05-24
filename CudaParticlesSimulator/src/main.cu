@@ -183,5 +183,38 @@ int main(int argc, char** argv) {
         swap(d_y_vel_old, d_y_vel_new);
         swap(d_z_vel_old, d_z_vel_new);
     }
-    
+
+    // Free memory
+    free(h_masses);
+
+    free(h_x_pos);
+    free(h_y_pos);
+    free(h_z_pos);
+
+    free(h_x_vel);
+    free(h_y_vel);
+    free(h_z_vel);
+
+    // free device memory
+    cudaFree(d_masses);
+
+    cudaFree(d_x_pos_old);
+    cudaFree(d_y_pos_old);
+    cudaFree(d_z_pos_old);
+
+    cudaFree(d_x_vel_old);
+    cudaFree(d_y_vel_old);
+    cudaFree(d_z_vel_old);
+
+    cudaFree(d_x_pos_new);
+    cudaFree(d_y_pos_new);
+    cudaFree(d_z_pos_new);
+
+    cudaFree(d_x_vel_new);
+    cudaFree(d_y_vel_new);
+    cudaFree(d_z_vel_new);
+
+    cudaFree(d_x_acc);
+    cudaFree(d_y_acc);
+    cudaFree(d_z_acc);
 }

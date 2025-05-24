@@ -5,10 +5,9 @@ void particle::calcAcceleration(const particle particle, double3& acceleration) 
     float dist = sqrt(
             (particle.position.x - this->position.x) * (particle.position.x - this->position.x) +
             (particle.position.y - this->position.y) * (particle.position.y - this->position.y) +
-            (particle.position.z - this->position.z) * (particle.position.z - this->position.z)
+            (particle.position.z - this->position.z) * (particle.position.z - this->position.z) +
+            EPS * EPS
         );
-
-    if (dist <= DIST_THRESHOLD) [[unlikely]] return;
 
     acceleration.x += G * particle.mass * (particle.position.x - this->position.x) / (dist*dist*dist);
     acceleration.y += G * particle.mass * (particle.position.y - this->position.y) / (dist*dist*dist);
