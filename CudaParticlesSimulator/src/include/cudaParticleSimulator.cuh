@@ -3,9 +3,14 @@
 
 #include <cuda.h>
 
+#ifndef VERSION
+    #define VERSION 0
+#endif
+
 __global__ void newState(
     const uint64_t particleNum,
     const double* masses,
+#if VERSION == 0
     const double* x_pos_old,
     const double* y_pos_old,
     const double* z_pos_old,
@@ -21,6 +26,13 @@ __global__ void newState(
     double* x_acc,
     double* y_acc,
     double* z_acc
+#else
+    const double3* pos_old,
+    const double3* vel_old,
+    double3* pos_new,
+    double3* vel_new,
+    double3* acc
+#endif
 );
 
 #endif

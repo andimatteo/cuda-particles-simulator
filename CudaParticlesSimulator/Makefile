@@ -9,10 +9,11 @@ GEN_DIR := ../utils
 
 LOADLEVELS := low medium high
 THREADSBLOCK := 32 64 128 256 512 1024
+VERSIONS := 0 1 2 3
 
-EPOCHS_high := 100
-EPOCHS_medium := 100
-EPOCHS_low := 100
+EPOCHS_high := 30
+EPOCHS_medium := 30
+EPOCHS_low := 30
 PARTICLENUM_high := 20000
 PARTICLENUM_medium := 5000
 PARTICLENUM_low := 100
@@ -25,40 +26,49 @@ LDFLAGS += -I$(SRC_DIR)/include
 SOURCES = $(wildcard $(SRC_DIR)/*.cu)
 HEADERS = $(wildcard $(SRC_DIR)/include/*.cuh)
 OBJECTS = $(wildcard $(OBJ_DIR)/*.o)
-TARGETS = $(foreach level,$(LOADLEVELS),$(foreach threads,$(THREADSBLOCK),$(BIN_DIR)/main_$(level)_$(threads)))
+TARGETS := $(foreach level,$(LOADLEVELS), \
+			$(foreach threads,$(THREADSBLOCK), \
+				$(foreach version,$(VERSIONS), \
+					$(BIN_DIR)/main_$(level)_$(threads)_$(version))))
+TESTS 	= $(foreach level,$(LOADLEVELS), \
+			$(foreach threads,$(THREADSBLOCK), \
+				$(foreach version,$(VERSIONS), \
+					test_$(level)_$(threads)_$(version)))) 
 OUTPUT_FILES = $(wildcard $(OUT_DIR)/output*.txt)
 ERROR_FILES = $(wildcard $(OUT_DIR)/error*.txt)
+TIME_FILES = $(wildcard $(OUT_DIR)/time*.txt)
 
 
-.PHONY: all clean run debug
+.PHONY: all clean test
 
 all: $(TARGETS)
 
 $(BIN_DIR)/main_%: $(SOURCES) $(HEADERS)
-# Retrieve parameters from target name: main_<level>_<threads>
+# Retrieve parameters from target name: main_<level>_<threads>_<version>
 	$(eval PARAMS_ := $(patsubst $(BIN_DIR)/main_%,%,$@))
 	$(eval PARAMS = $(subst _, ,$(PARAMS_)))
 	$(eval level := $(word 1,$(PARAMS)))
 	$(eval threads := $(word 2,$(PARAMS)))
+	$(eval version := $(word 3,$(PARAMS)))
 
-	$(NVCC) $(NVCCFLAGS) -o $@ $(SOURCES) $(LDFLAGS) -DPARTICLE_NUM=$(PARTICLENUM_$(level)) -DDURATION=$(EPOCHS_$(level)) -DTHREADS_PER_BLOCK=$(threads)
-
-debug: NVCCFLAGS := $(DEBUG_FLAGS)
-debug: clean $(TARGET)
+	$(NVCC) $(NVCCFLAGS) -o $@ $(SOURCES) $(LDFLAGS) -DPARTICLE_NUM=$(PARTICLENUM_$(level)) -DDURATION=$(EPOCHS_$(level)) -DTHREADS_PER_BLOCK=$(threads) -DVERSION=$(version)
 
 clean:
-	rm -f $(OBJECTS) $(TARGETS) $(OUTPUT_FILES) $(ERROR_FILES)
+	rm -f $(OBJECTS) $(TARGETS) $(OUTPUT_FILES) $(ERROR_FILES) $(TIME_FILES)
 
 test_%: $(BIN_DIR)/main_%
-# Retrieve parameters from target name: main_<level>_<threads>
+# Retrieve parameters from target name: main_<level>_<threads>_<version>
 	$(eval PARAMS_ := $(patsubst test_%,%,$@))
 	$(eval PARAMS = $(subst _, ,$(PARAMS_)))
 	$(eval level := $(word 1,$(PARAMS)))
 	$(eval threads := $(word 2,$(PARAMS)))
-	./$< 0 $(OUT_DIR)/time.txt < $(LOAD_DIR)/$(level).txt > $(OUT_DIR)/output_$(level)_$(threads).txt 2> $(OUT_DIR)/error_$(level)_$(threads).txt
+	$(eval version := $(word 3,$(PARAMS)))
 
-test: $(foreach level,$(LOADLEVELS),$(foreach threads,$(THREADSBLOCK),test_$(level)_$(threads)))
+	./$< $(OUT_DIR)/time.txt < $(LOAD_DIR)/$(level).txt > $(OUT_DIR)/output_$(level)_$(threads)_$(version).txt 2> $(OUT_DIR)/error_$(level)_$(threads)_$(version).txt
+
+test: $(TESTS)
 	@echo "All tests completed."
 
+# low medium high
 generate_%: $(GEN_DIR)/generate_config.py
 	python3 $< -e $(EPOCHS_$*) -p $(PARTICLENUM_$*) -o $(LOAD_DIR)/$*.txt
