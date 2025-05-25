@@ -4,6 +4,7 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
 
 #ifndef PARTICLE_NUM
@@ -22,6 +23,20 @@
 
 int main(int argc, char** argv) {
     // TODO: manage arguments
+    if (argc != 3) {
+        cerr << "Usage: " << argv[0] << " <version> <time_file>\n";
+        return 1;
+    }
+
+    // Read the version and time file
+    int version = atoi(argv[1]);
+    char *time_file = argv[2];
+
+    ofstream time_stream(time_file, ios::out | ios::app);
+    if (!time_stream.is_open()) {
+        cerr << "Could not open time file: " << time_file << endl;
+        return 1;
+    }
 
     // host memory
     double *h_masses = (double*) malloc(PARTICLE_NUM * sizeof(double));
@@ -122,8 +137,14 @@ int main(int argc, char** argv) {
         return 0;
     }
 
+    //set up Cuda Event for timing
+    float milliseconds;
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+
     for (int iter = 0; iter < DURATION; iter++) {
-        // TODO: check time
+        cudaEventRecord(start);
         // set up the kernel launch parameters
         newState << <(PARTICLE_NUM + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK, THREADS_PER_BLOCK >> >(
             PARTICLE_NUM,
@@ -144,6 +165,18 @@ int main(int argc, char** argv) {
             d_y_acc,
             d_z_acc
         );
+        result = cudaDeviceSynchronize();
+
+        cudaEventRecord(stop);
+        cudaEventSynchronize(stop);
+
+        cudaEventElapsedTime(&milliseconds, start, stop);
+        if (result != cudaSuccess) {
+            cerr << "Kernel launch failed with error: " << cudaGetErrorString(result) << endl;
+            return 0;
+        }
+        // print the time taken for this iteration
+        time_stream << version << " " << THREADS_PER_BLOCK << " " << PARTICLE_NUM << " " << iter << ": " << milliseconds << "ms" << endl;
 
         // log results
         result = cudaMemcpy(h_x_pos, d_x_pos_new, sizeof(double) * PARTICLE_NUM,
@@ -217,4 +250,10 @@ int main(int argc, char** argv) {
     cudaFree(d_x_acc);
     cudaFree(d_y_acc);
     cudaFree(d_z_acc);
+
+    // destroy Cuda Event
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
+    time_stream.close();
+    return 0;
 }

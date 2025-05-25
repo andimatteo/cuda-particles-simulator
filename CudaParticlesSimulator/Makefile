@@ -18,7 +18,7 @@ PARTICLENUM_medium := 5000
 PARTICLENUM_low := 100
 
 NVCC := nvcc
-NVCCFLAGS := -gencode arch=compute_61,code=sm_61 -O3
+NVCCFLAGS := -gencode arch=compute_61,code=sm_61 -O3 -Wno-deprecated-gpu-targets
 # DEBUG_FLAGS = -Wall -Wextra -O3 -std=c++17 -DDEBUG -fopenmp -g
 LDFLAGS += -I$(SRC_DIR)/include
 
@@ -41,7 +41,7 @@ $(BIN_DIR)/main_%: $(SOURCES) $(HEADERS)
 	$(eval level := $(word 1,$(PARAMS)))
 	$(eval threads := $(word 2,$(PARAMS)))
 
-	$(NVCC) $(NVCCFLAGS) -o $@ $(SOURCES) $(LDFLAGS) -DPARTICLE_NUM=$(PARTICLENUM_$(level)) -DEPOCHS=$(EPOCHS_$(level)) -DTHREADS_PER_BLOCK=$(threads)
+	$(NVCC) $(NVCCFLAGS) -o $@ $(SOURCES) $(LDFLAGS) -DPARTICLE_NUM=$(PARTICLENUM_$(level)) -DDURATION=$(EPOCHS_$(level)) -DTHREADS_PER_BLOCK=$(threads)
 
 debug: NVCCFLAGS := $(DEBUG_FLAGS)
 debug: clean $(TARGET)
@@ -55,7 +55,7 @@ test_%: $(BIN_DIR)/main_%
 	$(eval PARAMS = $(subst _, ,$(PARAMS_)))
 	$(eval level := $(word 1,$(PARAMS)))
 	$(eval threads := $(word 2,$(PARAMS)))
-	./$< 0 < $(LOAD_DIR)/$(level).txt > $(OUT_DIR)/output_$(level)_$(threads).txt 2> $(OUT_DIR)/error_$(level)_$(threads).txt
+	./$< 0 $(OUT_DIR)/time.txt < $(LOAD_DIR)/$(level).txt > $(OUT_DIR)/output_$(level)_$(threads).txt 2> $(OUT_DIR)/error_$(level)_$(threads).txt
 
 test: $(foreach level,$(LOADLEVELS),$(foreach threads,$(THREADSBLOCK),test_$(level)_$(threads)))
 	@echo "All tests completed."
