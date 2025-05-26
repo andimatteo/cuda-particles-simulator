@@ -1,6 +1,7 @@
 #ifndef CUDA_PARTICLE_SIMULATOR_CUH
 #define CUDA_PARTICLE_SIMULATOR_CUH
 
+#include "Particle.cuh"
 #include <cuda.h>
 
 #ifndef VERSION
@@ -9,8 +10,8 @@
 
 __global__ void newState(
     const uint64_t particleNum,
-    const double* masses,
 #if VERSION == 0
+    const double* masses,
     const double* x_pos_old,
     const double* y_pos_old,
     const double* z_pos_old,
@@ -27,11 +28,13 @@ __global__ void newState(
     double* y_acc,
     double* z_acc
 #else
-    const double3* pos_old,
-    const double3* vel_old,
-    double3* pos_new,
-    double3* vel_new,
-    double3* acc
+    // const double3* pos_old,
+    // const double3* vel_old,
+    // double3* pos_new,
+    // double3* vel_new,
+    // double3* acc
+    Particle* particles_old,
+    Particle* particles_new
 #endif
 );
 

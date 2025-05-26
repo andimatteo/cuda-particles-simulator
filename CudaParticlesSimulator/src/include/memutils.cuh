@@ -1,6 +1,7 @@
 #ifndef MEMUTILS_CUH
 #define MEMUTILS_CUH
 
+#include "Particle.cuh"
 #include <cuda_runtime.h>
 #include <iostream>
 

@@ -35,6 +35,8 @@ T* allocateAndNull(int length) {
 
 template double* allocateAndCopy<double>(double* array, int length);
 template double3* allocateAndCopy<double3>(double3* array, int length);
+template Particle* allocateAndCopy<Particle>(Particle* array, int length);
 
 template double* allocateAndNull<double>(int length);
 template double3* allocateAndNull<double3>(int length);
+template Particle* allocateAndNull<Particle>(int length);

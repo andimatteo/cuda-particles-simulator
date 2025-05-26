@@ -43,10 +43,9 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    // host memory
-    double *h_masses = (double*) malloc(PARTICLE_NUM * sizeof(double));
 
 #if VERSION == 0
+    double *h_masses = (double*) malloc(PARTICLE_NUM * sizeof(double));
     double *h_x_pos = (double*) malloc(PARTICLE_NUM * sizeof(double));
     double *h_y_pos = (double*) malloc(PARTICLE_NUM * sizeof(double));
     double *h_z_pos = (double*) malloc(PARTICLE_NUM * sizeof(double));
@@ -55,8 +54,9 @@ int main(int argc, char** argv) {
     double *h_y_vel = (double*) malloc(PARTICLE_NUM * sizeof(double));
     double *h_z_vel = (double*) malloc(PARTICLE_NUM * sizeof(double));
 #else
-    double3 *h_pos = (double3*) malloc(PARTICLE_NUM * sizeof(double3));
-    double3 *h_vel = (double3*) malloc(PARTICLE_NUM * sizeof(double3));
+    // double3 *h_pos = (double3*) malloc(PARTICLE_NUM * sizeof(double3));
+    // double3 *h_vel = (double3*) malloc(PARTICLE_NUM * sizeof(double3));
+    Particle *h_particles = (Particle*) malloc(PARTICLE_NUM * sizeof(Particle));
 #endif
 
     // initialize host memory
@@ -68,18 +68,22 @@ int main(int argc, char** argv) {
 #if VERSION == 0
         cin >> h_x_pos[i] >> h_y_pos[i] >> h_z_pos[i]
             >> h_x_vel[i] >> h_y_vel[i] >> h_z_vel[i]
-#else
-        cin >> h_pos[i].x >> h_pos[i].y >> h_pos[i].z
-            >> h_vel[i].x >> h_vel[i].y >> h_vel[i].z
-#endif
             >> h_masses[i];
+#else
+        // cin >> h_pos[i].x >> h_pos[i].y >> h_pos[i].z
+        //     >> h_vel[i].x >> h_vel[i].y >> h_vel[i].z
+        //     >> h_masses[i];
+        cin >> h_particles[i].pos.x >> h_particles[i].pos.y >> h_particles[i].pos.z
+            >> h_particles[i].vel.x >> h_particles[i].vel.y >> h_particles[i].vel.z
+            >> h_particles[i].mass;
+#endif
     }
 
     // allocate and initialize device memory
     // TODO: declare __constant__
-    double *d_masses = allocateAndCopy<double>(h_masses, PARTICLE_NUM);
 
 #if VERSION == 0
+    double *d_masses = allocateAndCopy<double>(h_masses, PARTICLE_NUM);
     double *d_x_pos_old = allocateAndCopy<double>(h_x_pos, PARTICLE_NUM);
     double *d_y_pos_old = allocateAndCopy<double>(h_y_pos, PARTICLE_NUM);
     double *d_z_pos_old = allocateAndCopy<double>(h_z_pos, PARTICLE_NUM);
@@ -100,77 +104,13 @@ int main(int argc, char** argv) {
     double *d_y_acc = allocateAndNull<double>(PARTICLE_NUM);
     double *d_z_acc = allocateAndNull<double>(PARTICLE_NUM);
 #else
-    double3 *d_pos_old = allocateAndCopy<double3>(h_pos, PARTICLE_NUM);
-    double3 *d_vel_old = allocateAndCopy<double3>(h_vel, PARTICLE_NUM);
-    double3 *d_pos_new = allocateAndNull<double3>(PARTICLE_NUM);
-    double3 *d_vel_new = allocateAndNull<double3>(PARTICLE_NUM);
-    double3 *d_acc = allocateAndNull<double3>(PARTICLE_NUM);
-#endif
-
-    // copy masses from host to device
-    cudaError_t result = cudaMemcpy(d_masses, h_masses, sizeof(double) * PARTICLE_NUM,
-        cudaMemcpyHostToDevice);
-    if (result != cudaSuccess) {
-        cerr << "Could not copy the masses array to the device \n";
-        return 0;
-    }
-
-    // copy positions and velocities from host to device
-#if VERSION == 0
-    result = cudaMemcpy(d_x_pos_old, h_x_pos, sizeof(double) * PARTICLE_NUM,
-        cudaMemcpyHostToDevice);
-    if (result != cudaSuccess) {
-        cerr << "Could not copy the x_pos array to the device \n";
-        return 0;
-    }
-
-    result = cudaMemcpy(d_y_pos_old, h_y_pos, sizeof(double) * PARTICLE_NUM,
-    cudaMemcpyHostToDevice);
-    if (result != cudaSuccess) {
-        cerr << "Could not copy the y_pos array to the device \n";
-        return 0;
-    }
-
-    result = cudaMemcpy(d_z_pos_old, h_z_pos, sizeof(double) * PARTICLE_NUM,
-    cudaMemcpyHostToDevice);
-    if (result != cudaSuccess) {
-        cerr << "Could not copy the z_pos array to the device \n";
-        return 0;
-    }
-
-    result = cudaMemcpy(d_x_vel_old, h_x_vel, sizeof(double) * PARTICLE_NUM,
-    cudaMemcpyHostToDevice);
-    if (result != cudaSuccess) {
-        cerr << "Could not copy the x_vel array to the device \n";
-        return 0;
-    }
-
-    result = cudaMemcpy(d_y_vel_old, h_y_vel, sizeof(double) * PARTICLE_NUM,
-    cudaMemcpyHostToDevice);
-    if (result != cudaSuccess) {
-        cerr << "Could not copy the y_vel array to the device \n";
-        return 0;
-    }
-
-    result = cudaMemcpy(d_z_vel_old, h_z_vel, sizeof(double) * PARTICLE_NUM,
-    cudaMemcpyHostToDevice);
-    if (result != cudaSuccess) {
-        cerr << "Could not copy the z_vel array to the device \n";
-        return 0;
-    }
-#else
-    result = cudaMemcpy(d_pos_old, h_pos, sizeof(double3) * PARTICLE_NUM,
-        cudaMemcpyHostToDevice);
-    if (result != cudaSuccess) {
-        cerr << "Could not copy the pos array to the device \n";
-        return 0;
-    }
-    result = cudaMemcpy(d_vel_old, h_vel, sizeof(double3) * PARTICLE_NUM,
-        cudaMemcpyHostToDevice);
-    if (result != cudaSuccess) {
-        cerr << "Could not copy the vel array to the device \n";
-        return 0;
-    }
+    // double3 *d_pos_old = allocateAndCopy<double3>(h_pos, PARTICLE_NUM);
+    // double3 *d_vel_old = allocateAndCopy<double3>(h_vel, PARTICLE_NUM);
+    // double3 *d_pos_new = allocateAndNull<double3>(PARTICLE_NUM);
+    // double3 *d_vel_new = allocateAndNull<double3>(PARTICLE_NUM);
+    // double3 *d_acc = allocateAndNull<double3>(PARTICLE_NUM);
+    Particle *d_particles_old = allocateAndCopy<Particle>(h_particles, PARTICLE_NUM);
+    Particle *d_particles_new = allocateAndNull<Particle>(PARTICLE_NUM);
 #endif
 
     //set up Cuda Event for timing
@@ -184,8 +124,8 @@ int main(int argc, char** argv) {
         // set up the kernel launch parameters
         newState << <(PARTICLE_NUM + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK, THREADS_PER_BLOCK >> >(
             PARTICLE_NUM,
-            d_masses,
 #if VERSION == 0
+            d_masses,
             d_x_pos_old,
             d_y_pos_old,
             d_z_pos_old,
@@ -202,14 +142,16 @@ int main(int argc, char** argv) {
             d_y_acc,
             d_z_acc
 #else
-            d_pos_old,
-            d_vel_old,
-            d_pos_new,
-            d_vel_new,
-            d_acc
+            // d_pos_old,
+            // d_vel_old,
+            // d_pos_new,
+            // d_vel_new,
+            // d_acc
+            d_particles_old,
+            d_particles_new
 #endif
         );
-        result = cudaDeviceSynchronize();
+        cudaError_t result = cudaDeviceSynchronize();
 
         cudaEventRecord(stop);
         cudaEventSynchronize(stop);
@@ -243,10 +185,16 @@ int main(int argc, char** argv) {
             return 0;
         }
 #else
-        result = cudaMemcpy(h_pos, d_pos_new, sizeof(double3) * PARTICLE_NUM,
+        // result = cudaMemcpy(h_pos, d_pos_new, sizeof(double3) * PARTICLE_NUM,
+        //     cudaMemcpyDeviceToHost);
+        // if (result != cudaSuccess) {
+        //     cerr << "Could not copy the pos array to the host \n";
+        //     return 0;
+        // }
+        result = cudaMemcpy(h_particles, d_particles_new, sizeof(Particle) * PARTICLE_NUM,
             cudaMemcpyDeviceToHost);
         if (result != cudaSuccess) {
-            cerr << "Could not copy the pos array to the host \n";
+            cerr << "Could not copy the particles array to the host \n";
             return 0;
         }
 #endif
@@ -257,9 +205,12 @@ int main(int argc, char** argv) {
                 << h_y_pos[particle] << " "
                 << h_z_pos[particle] << " "
 #else 
-            cout << h_pos[particle].x << " "
-                << h_pos[particle].y << " "
-                << h_pos[particle].z << " "
+            // cout << h_pos[particle].x << " "
+            //     << h_pos[particle].y << " "
+            //     << h_pos[particle].z << " "
+            cout << h_particles[particle].pos.x << " "
+                << h_particles[particle].pos.y << " "
+                << h_particles[particle].pos.z << " "
 #endif
                 << endl;
         }
@@ -276,16 +227,18 @@ int main(int argc, char** argv) {
         swap(d_y_vel_old, d_y_vel_new);
         swap(d_z_vel_old, d_z_vel_new);
 #else
-        swap(d_pos_old, d_pos_new);
-        swap(d_vel_old, d_vel_new);
+        // swap(d_pos_old, d_pos_new);
+        // swap(d_vel_old, d_vel_new);
+        swap(d_particles_old, d_particles_new);
 #endif
     }
 
     // Free memory
+
+#if VERSION == 0
     free(h_masses);
     cudaFree(d_masses);
 
-#if VERSION == 0
     free(h_x_pos);
     free(h_y_pos);
     free(h_z_pos);
@@ -314,13 +267,16 @@ int main(int argc, char** argv) {
     cudaFree(d_y_acc);
     cudaFree(d_z_acc);
 #else
-    free(h_pos);
-    free(h_vel);
-    cudaFree(d_pos_old);
-    cudaFree(d_vel_old);
-    cudaFree(d_pos_new);
-    cudaFree(d_vel_new);
-    cudaFree(d_acc);
+    // free(h_pos);
+    // free(h_vel);
+    // cudaFree(d_pos_old);
+    // cudaFree(d_vel_old);
+    // cudaFree(d_pos_new);
+    // cudaFree(d_vel_new);
+    // cudaFree(d_acc);
+    free(h_particles);
+    cudaFree(d_particles_old);
+    cudaFree(d_particles_new);
 #endif
 
     // destroy Cuda Event
