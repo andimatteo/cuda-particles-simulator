@@ -14,7 +14,7 @@
     #define VERSION 0
 #endif
 
-int main_0(ofstream &time_stream) {
+int main_0_1(ofstream &time_stream) {
 
     Particle *h_particles = (Particle*) malloc(PARTICLE_NUM * sizeof(Particle));
 
@@ -44,7 +44,11 @@ int main_0(ofstream &time_stream) {
     for (int iter = 0; iter < DURATION; iter++) {
         cudaEventRecord(start);
         // set up the kernel launch parameters
+#if VERSION == 0
         newState_0 << <(PARTICLE_NUM + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK, THREADS_PER_BLOCK >> >(
+#else 
+        newState_1 << <(PARTICLE_NUM + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK, THREADS_PER_BLOCK >> >(
+#endif
             d_particles_old,
             d_particles_new
         );
@@ -92,19 +96,20 @@ int main_0(ofstream &time_stream) {
     cudaEventDestroy(stop);
     time_stream.close();
     return 0;
-
 }
 
-int main_1(ofstream &time_stream) {
 
-    double *h_masses = (double*) malloc(PARTICLE_NUM * sizeof(double));
-    double *h_x_pos = (double*) malloc(PARTICLE_NUM * sizeof(double));
-    double *h_y_pos = (double*) malloc(PARTICLE_NUM * sizeof(double));
-    double *h_z_pos = (double*) malloc(PARTICLE_NUM * sizeof(double));
 
-    double *h_x_vel = (double*) malloc(PARTICLE_NUM * sizeof(double));
-    double *h_y_vel = (double*) malloc(PARTICLE_NUM * sizeof(double));
-    double *h_z_vel = (double*) malloc(PARTICLE_NUM * sizeof(double));
+int main_2_3(ofstream &time_stream) {
+
+    float *h_masses = (float*) malloc(PARTICLE_NUM * sizeof(float));
+    float *h_x_pos = (float*) malloc(PARTICLE_NUM * sizeof(float));
+    float *h_y_pos = (float*) malloc(PARTICLE_NUM * sizeof(float));
+    float *h_z_pos = (float*) malloc(PARTICLE_NUM * sizeof(float));
+
+    float *h_x_vel = (float*) malloc(PARTICLE_NUM * sizeof(float));
+    float *h_y_vel = (float*) malloc(PARTICLE_NUM * sizeof(float));
+    float *h_z_vel = (float*) malloc(PARTICLE_NUM * sizeof(float));
 
     // initialize host memory
     int unused;
@@ -118,28 +123,23 @@ int main_1(ofstream &time_stream) {
     }
 
     // allocate and initialize device memory
-    // TODO: declare __constant__
 
-    double *d_masses = allocateAndCopy<double>(h_masses, PARTICLE_NUM);
-    double *d_x_pos_old = allocateAndCopy<double>(h_x_pos, PARTICLE_NUM);
-    double *d_y_pos_old = allocateAndCopy<double>(h_y_pos, PARTICLE_NUM);
-    double *d_z_pos_old = allocateAndCopy<double>(h_z_pos, PARTICLE_NUM);
+    float *d_masses = allocateAndCopy<float>(h_masses, PARTICLE_NUM);
+    float *d_x_pos_old = allocateAndCopy<float>(h_x_pos, PARTICLE_NUM);
+    float *d_y_pos_old = allocateAndCopy<float>(h_y_pos, PARTICLE_NUM);
+    float *d_z_pos_old = allocateAndCopy<float>(h_z_pos, PARTICLE_NUM);
 
-    double *d_x_vel_old = allocateAndCopy<double>(h_x_vel, PARTICLE_NUM); 
-    double *d_y_vel_old = allocateAndCopy<double>(h_y_vel, PARTICLE_NUM);
-    double *d_z_vel_old = allocateAndCopy<double>(h_z_vel, PARTICLE_NUM);
+    float *d_x_vel_old = allocateAndCopy<float>(h_x_vel, PARTICLE_NUM); 
+    float *d_y_vel_old = allocateAndCopy<float>(h_y_vel, PARTICLE_NUM);
+    float *d_z_vel_old = allocateAndCopy<float>(h_z_vel, PARTICLE_NUM);
 
-    double *d_x_pos_new = allocateAndNull<double>(PARTICLE_NUM);
-    double *d_y_pos_new = allocateAndNull<double>(PARTICLE_NUM);
-    double *d_z_pos_new = allocateAndNull<double>(PARTICLE_NUM);
+    float *d_x_pos_new = allocateAndNull<float>(PARTICLE_NUM);
+    float *d_y_pos_new = allocateAndNull<float>(PARTICLE_NUM);
+    float *d_z_pos_new = allocateAndNull<float>(PARTICLE_NUM);
 
-    double *d_x_vel_new = allocateAndNull<double>(PARTICLE_NUM); 
-    double *d_y_vel_new = allocateAndNull<double>(PARTICLE_NUM);
-    double *d_z_vel_new = allocateAndNull<double>(PARTICLE_NUM);
-
-    double *d_x_acc = allocateAndNull<double>(PARTICLE_NUM);
-    double *d_y_acc = allocateAndNull<double>(PARTICLE_NUM);
-    double *d_z_acc = allocateAndNull<double>(PARTICLE_NUM);
+    float *d_x_vel_new = allocateAndNull<float>(PARTICLE_NUM); 
+    float *d_y_vel_new = allocateAndNull<float>(PARTICLE_NUM);
+    float *d_z_vel_new = allocateAndNull<float>(PARTICLE_NUM);
 
     //set up Cuda Event for timing
     float milliseconds;
@@ -150,172 +150,11 @@ int main_1(ofstream &time_stream) {
     for (int iter = 0; iter < DURATION; iter++) {
         cudaEventRecord(start);
         // set up the kernel launch parameters
-        newState_1 << <(PARTICLE_NUM + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK, THREADS_PER_BLOCK >> >(
-            d_masses,
-            d_x_pos_old,
-            d_y_pos_old,
-            d_z_pos_old,
-            d_x_vel_old,
-            d_y_vel_old,
-            d_z_vel_old,
-            d_x_pos_new,
-            d_y_pos_new,
-            d_z_pos_new,
-            d_x_vel_new,
-            d_y_vel_new,
-            d_z_vel_new,
-            d_x_acc,
-            d_y_acc,
-            d_z_acc
-        );
-        cudaError_t result = cudaDeviceSynchronize();
-
-        cudaEventRecord(stop);
-        cudaEventSynchronize(stop);
-
-        cudaEventElapsedTime(&milliseconds, start, stop);
-        if (result != cudaSuccess) {
-            cerr << "Kernel launch failed with error: " << cudaGetErrorString(result) << endl;
-            return 0;
-        }
-        // print the time taken for this iteration
-        time_stream << VERSION << " " << THREADS_PER_BLOCK << " " << PARTICLE_NUM << " " << iter << ": " << milliseconds << "ms" << endl;
-
-        // log results
-        result = cudaMemcpy(h_x_pos, d_x_pos_new, sizeof(double) * PARTICLE_NUM,
-            cudaMemcpyDeviceToHost);
-        if (result != cudaSuccess) {
-            cerr << "Could not copy the x_pos array to the host \n";
-            return 0;
-        }
-        result = cudaMemcpy(h_y_pos, d_y_pos_new, sizeof(double) * PARTICLE_NUM,
-            cudaMemcpyDeviceToHost);
-        if (result != cudaSuccess) {
-            cerr << "Could not copy the y_pos array to the host \n";
-            return 0;
-        }
-        result = cudaMemcpy(h_z_pos, d_z_pos_new, sizeof(double) * PARTICLE_NUM,
-            cudaMemcpyDeviceToHost);
-        if (result != cudaSuccess) {
-            cerr << "Could not copy the z_pos array to the host \n";
-            return 0;
-        }
-
-        for (int particle = 0; particle < PARTICLE_NUM; particle++) {
-            cout << h_x_pos[particle] << " "
-                << h_y_pos[particle] << " "
-                << h_z_pos[particle] << " "
-                << endl;
-        }
-        cout << endl;
-        // also velocities?
-
-        // swap the old and new positions and velocities
-        swap(d_x_pos_old, d_x_pos_new);
-        swap(d_y_pos_old, d_y_pos_new);
-        swap(d_z_pos_old, d_z_pos_new);
-
-        swap(d_x_vel_old, d_x_vel_new);
-        swap(d_y_vel_old, d_y_vel_new);
-        swap(d_z_vel_old, d_z_vel_new);
-    }
-
-    // Free memory
-
-    free(h_masses);
-    cudaFree(d_masses);
-
-    free(h_x_pos);
-    free(h_y_pos);
-    free(h_z_pos);
-
-    free(h_x_vel);
-    free(h_y_vel);
-    free(h_z_vel);
-
-    cudaFree(d_x_pos_old);
-    cudaFree(d_y_pos_old);
-    cudaFree(d_z_pos_old);
-
-    cudaFree(d_x_vel_old);
-    cudaFree(d_y_vel_old);
-    cudaFree(d_z_vel_old);
-
-    cudaFree(d_x_pos_new);
-    cudaFree(d_y_pos_new);
-    cudaFree(d_z_pos_new);
-
-    cudaFree(d_x_vel_new);
-    cudaFree(d_y_vel_new);
-    cudaFree(d_z_vel_new);
-
-    cudaFree(d_x_acc);
-    cudaFree(d_y_acc);
-    cudaFree(d_z_acc);
-
-    // destroy Cuda Event
-    cudaEventDestroy(start);
-    cudaEventDestroy(stop);
-    time_stream.close();
-    return 0;
-}
-
-int main_2(ofstream &time_stream) {
-
-    double *h_masses = (double*) malloc(PARTICLE_NUM * sizeof(double));
-    double *h_x_pos = (double*) malloc(PARTICLE_NUM * sizeof(double));
-    double *h_y_pos = (double*) malloc(PARTICLE_NUM * sizeof(double));
-    double *h_z_pos = (double*) malloc(PARTICLE_NUM * sizeof(double));
-
-    double *h_x_vel = (double*) malloc(PARTICLE_NUM * sizeof(double));
-    double *h_y_vel = (double*) malloc(PARTICLE_NUM * sizeof(double));
-    double *h_z_vel = (double*) malloc(PARTICLE_NUM * sizeof(double));
-
-    // initialize host memory
-    int unused;
-    cin >> unused;
-    cin >> unused;
-
-    for (int i = 0; i < PARTICLE_NUM; i++) {
-        cin >> h_x_pos[i] >> h_y_pos[i] >> h_z_pos[i]
-            >> h_x_vel[i] >> h_y_vel[i] >> h_z_vel[i]
-            >> h_masses[i];
-    }
-
-    // allocate and initialize device memory
-    // TODO: declare __constant__
-
-    double *d_masses = allocateAndCopy<double>(h_masses, PARTICLE_NUM);
-    double *d_x_pos_old = allocateAndCopy<double>(h_x_pos, PARTICLE_NUM);
-    double *d_y_pos_old = allocateAndCopy<double>(h_y_pos, PARTICLE_NUM);
-    double *d_z_pos_old = allocateAndCopy<double>(h_z_pos, PARTICLE_NUM);
-
-    double *d_x_vel_old = allocateAndCopy<double>(h_x_vel, PARTICLE_NUM); 
-    double *d_y_vel_old = allocateAndCopy<double>(h_y_vel, PARTICLE_NUM);
-    double *d_z_vel_old = allocateAndCopy<double>(h_z_vel, PARTICLE_NUM);
-
-    double *d_x_pos_new = allocateAndNull<double>(PARTICLE_NUM);
-    double *d_y_pos_new = allocateAndNull<double>(PARTICLE_NUM);
-    double *d_z_pos_new = allocateAndNull<double>(PARTICLE_NUM);
-
-    double *d_x_vel_new = allocateAndNull<double>(PARTICLE_NUM); 
-    double *d_y_vel_new = allocateAndNull<double>(PARTICLE_NUM);
-    double *d_z_vel_new = allocateAndNull<double>(PARTICLE_NUM);
-
-    double *d_x_acc = allocateAndNull<double>(PARTICLE_NUM);
-    double *d_y_acc = allocateAndNull<double>(PARTICLE_NUM);
-    double *d_z_acc = allocateAndNull<double>(PARTICLE_NUM);
-
-    //set up Cuda Event for timing
-    float milliseconds;
-    cudaEvent_t start, stop;
-    cudaEventCreate(&start);
-    cudaEventCreate(&stop);
-
-    for (int iter = 0; iter < DURATION; iter++) {
-        cudaEventRecord(start);
-        // set up the kernel launch parameters
+#if VERSION == 2
         newState_2 << <(PARTICLE_NUM + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK, THREADS_PER_BLOCK >> >(
+#else
+        newState_3 << <(PARTICLE_NUM + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK, THREADS_PER_BLOCK >> >(
+#endif
             d_masses,
             d_x_pos_old,
             d_y_pos_old,
@@ -328,10 +167,7 @@ int main_2(ofstream &time_stream) {
             d_z_pos_new,
             d_x_vel_new,
             d_y_vel_new,
-            d_z_vel_new,
-            d_x_acc,
-            d_y_acc,
-            d_z_acc
+            d_z_vel_new
         );
         cudaError_t result = cudaDeviceSynchronize();
 
@@ -347,19 +183,19 @@ int main_2(ofstream &time_stream) {
         time_stream << VERSION << " " << THREADS_PER_BLOCK << " " << PARTICLE_NUM << " " << iter << ": " << milliseconds << "ms" << endl;
 
         // log results
-        result = cudaMemcpy(h_x_pos, d_x_pos_new, sizeof(double) * PARTICLE_NUM,
+        result = cudaMemcpy(h_x_pos, d_x_pos_new, sizeof(float) * PARTICLE_NUM,
             cudaMemcpyDeviceToHost);
         if (result != cudaSuccess) {
             cerr << "Could not copy the x_pos array to the host \n";
             return 0;
         }
-        result = cudaMemcpy(h_y_pos, d_y_pos_new, sizeof(double) * PARTICLE_NUM,
+        result = cudaMemcpy(h_y_pos, d_y_pos_new, sizeof(float) * PARTICLE_NUM,
             cudaMemcpyDeviceToHost);
         if (result != cudaSuccess) {
             cerr << "Could not copy the y_pos array to the host \n";
             return 0;
         }
-        result = cudaMemcpy(h_z_pos, d_z_pos_new, sizeof(double) * PARTICLE_NUM,
+        result = cudaMemcpy(h_z_pos, d_z_pos_new, sizeof(float) * PARTICLE_NUM,
             cudaMemcpyDeviceToHost);
         if (result != cudaSuccess) {
             cerr << "Could not copy the z_pos array to the host \n";
@@ -413,10 +249,6 @@ int main_2(ofstream &time_stream) {
     cudaFree(d_x_vel_new);
     cudaFree(d_y_vel_new);
     cudaFree(d_z_vel_new);
-
-    cudaFree(d_x_acc);
-    cudaFree(d_y_acc);
-    cudaFree(d_z_acc);
 
     // destroy Cuda Event
     cudaEventDestroy(start);
@@ -441,12 +273,10 @@ int main(int argc, char** argv) {
     }
 
 // 3 versions
-#if VERSION == 0
-    return main_0(time_stream);
-#elif VERSION == 1
-    return main_1(time_stream);
-#elif VERSION == 2
-    return main_2(time_stream);
+#if VERSION == 0 || VERSION == 1
+    return main_0_1(time_stream);
+#elif VERSION == 2 || VERSION == 3
+    return main_2_3(time_stream);
 #else
     cerr << "Invalid VERSION defined. Please set VERSION to 0, 1, or 2." << endl;
     return 1;
