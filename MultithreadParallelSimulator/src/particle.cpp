@@ -1,6 +1,6 @@
 #include "particle.h"
 
-void particle::calcAcceleration(const particle particle, double3& acceleration) const {
+void particle::calcAcceleration(const particle particle, float3& acceleration) const {
 
     float dist = sqrt(
             (particle.position.x - this->position.x) * (particle.position.x - this->position.x) +
@@ -15,11 +15,11 @@ void particle::calcAcceleration(const particle particle, double3& acceleration) 
 
 }
 
-void particle::newState(particle& target, double3 acceleration) const {
+void particle::newState(particle& target, float3 acceleration) const {
 
-    target.position.x = this->position.x + this->velocity.x * STEP_TIME + 0.5 * acceleration.x * STEP_TIME * STEP_TIME;
-    target.position.y = this->position.y + this->velocity.y * STEP_TIME + 0.5 * acceleration.y * STEP_TIME * STEP_TIME;
-    target.position.z = this->position.z + this->velocity.z * STEP_TIME + 0.5 * acceleration.z * STEP_TIME * STEP_TIME;
+    target.position.x = this->position.x + this->velocity.x * STEP_TIME + 0.5f * acceleration.x * STEP_TIME * STEP_TIME;
+    target.position.y = this->position.y + this->velocity.y * STEP_TIME + 0.5f * acceleration.y * STEP_TIME * STEP_TIME;
+    target.position.z = this->position.z + this->velocity.z * STEP_TIME + 0.5f * acceleration.z * STEP_TIME * STEP_TIME;
 
     target.velocity.x = this->velocity.x + acceleration.x * STEP_TIME;
     target.velocity.y = this->velocity.y + acceleration.y * STEP_TIME;

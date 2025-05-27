@@ -2,15 +2,15 @@
 #define CODICE_PARTICLE_H
 
 #ifndef EPS
-    #define EPS 1e-10
+    #define EPS 1e-10f
 #endif
 
 #ifndef G
-    #define G 6.674e-11
+    #define G 6.674e-11f
 #endif
 
 #ifndef STEP_TIME
-    #define STEP_TIME 0.01
+    #define STEP_TIME 0.01f
 #endif
 
 #include <fstream>
@@ -18,19 +18,19 @@
 using namespace std;
 
 
-struct double3{
-    double x,y,z;
+struct float3{
+    float x,y,z;
 };
 
 class particle {
 public:
-    double3 position;
-    double3 velocity;
-    double mass;
+    float3 position;
+    float3 velocity;
+    float mass;
 
-    void calcAcceleration(const particle particle, double3& acceleration) const;
+    void calcAcceleration(const particle particle, float3& acceleration) const;
 
-    void newState(particle& target, double3 acceleration) const;
+    void newState(particle& target, float3 acceleration) const;
 };
 
 istream& operator>> (istream& is, particle& particle);
