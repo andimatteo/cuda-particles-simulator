@@ -11,16 +11,16 @@ LOADLEVELS := low medium high
 THREADSBLOCK := 32 64 128 256 512 1024
 VERSIONS := 0 1 2
 
-EPOCHS_high := 10
-EPOCHS_medium := 10
-EPOCHS_low := 10
+EPOCHS_high := 5
+EPOCHS_medium := 5
+EPOCHS_low := 5
 PARTICLENUM_high := 20000
 PARTICLENUM_medium := 5000
 PARTICLENUM_low := 100
 
 COMPUTE_CAPABILITY := $(shell if command -v nvidia-smi >/dev/null 2>&1; then nvidia-smi --query-gpu=compute_cap --format=csv,noheader | head -n 1 | sed 's/\.//g'; else echo 75; fi)
 NVCC := nvcc
-NVCCFLAGS := -gencode arch=compute_$(COMPUTE_CAPABILITY),code=sm_$(COMPUTE_CAPABILITY) -O3 -Wno-deprecated-gpu-targets
+NVCCFLAGS := -gencode arch=compute_$(COMPUTE_CAPABILITY),code=sm_$(COMPUTE_CAPABILITY) -O3 -Wno-deprecated-gpu-targets --use_fast_math
 # DEBUG_FLAGS = -Wall -Wextra -O3 -std=c++17 -DDEBUG -fopenmp -g
 LDFLAGS += -I$(SRC_DIR)/include
 

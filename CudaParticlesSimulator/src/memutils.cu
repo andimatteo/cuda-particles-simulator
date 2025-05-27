@@ -33,10 +33,10 @@ T* allocateAndNull(int length) {
     return dev_array;
 }
 
-template double* allocateAndCopy<double>(double* array, int length);
-template double3* allocateAndCopy<double3>(double3* array, int length);
+template float* allocateAndCopy<float>(float* array, int length);
+template float3* allocateAndCopy<float3>(float3* array, int length);
 template Particle* allocateAndCopy<Particle>(Particle* array, int length);
 
-template double* allocateAndNull<double>(int length);
-template double3* allocateAndNull<double3>(int length);
+template float* allocateAndNull<float>(int length);
+template float3* allocateAndNull<float3>(int length);
 template Particle* allocateAndNull<Particle>(int length);

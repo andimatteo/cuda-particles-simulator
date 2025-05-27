@@ -2,10 +2,10 @@
 #define PARTICLE_CUH
 
 struct Particle {
-    double mass;
-    double3 pos;
-    double3 vel;
-    double3 acc;
+    float mass;
+    float3 pos;
+    float3 vel;
+    float3 acc;
 };
 
 #endif

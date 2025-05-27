@@ -16,7 +16,7 @@
     #define THREADS_PER_BLOCK 128
 #endif
 
-#define SHARED_SIZE 48 * 1024 // 48 KB shared memory per block
+#define SHARED_SIZE 64 * 1024 // 48 KB shared memory per block
 
 __global__ void newState_0(
     Particle* particles_old,
@@ -24,41 +24,41 @@ __global__ void newState_0(
 );
 
 __global__ void newState_1(
-    const double* masses,
-    const double* x_pos_old,
-    const double* y_pos_old,
-    const double* z_pos_old,
-    const double* x_vel_old,
-    const double* y_vel_old,
-    const double* z_vel_old,
-    double* x_pos_new,
-    double* y_pos_new,
-    double* z_pos_new,
-    double* x_vel_new,
-    double* y_vel_new,
-    double* z_vel_new,
-    double* x_acc,
-    double* y_acc,
-    double* z_acc
+    const float* masses,
+    const float* x_pos_old,
+    const float* y_pos_old,
+    const float* z_pos_old,
+    const float* x_vel_old,
+    const float* y_vel_old,
+    const float* z_vel_old,
+    float* x_pos_new,
+    float* y_pos_new,
+    float* z_pos_new,
+    float* x_vel_new,
+    float* y_vel_new,
+    float* z_vel_new,
+    float* x_acc,
+    float* y_acc,
+    float* z_acc
 );
 
 __global__ void newState_2(
-    const double* masses,
-    const double* x_pos_old,
-    const double* y_pos_old,
-    const double* z_pos_old,
-    const double* x_vel_old,
-    const double* y_vel_old,
-    const double* z_vel_old,
-    double* x_pos_new,
-    double* y_pos_new,
-    double* z_pos_new,
-    double* x_vel_new,
-    double* y_vel_new,
-    double* z_vel_new,
-    double* x_acc,
-    double* y_acc,
-    double* z_acc
+    const float* masses,
+    const float* x_pos_old,
+    const float* y_pos_old,
+    const float* z_pos_old,
+    const float* x_vel_old,
+    const float* y_vel_old,
+    const float* z_vel_old,
+    float* x_pos_new,
+    float* y_pos_new,
+    float* z_pos_new,
+    float* x_vel_new,
+    float* y_vel_new,
+    float* z_vel_new,
+    float* x_acc,
+    float* y_acc,
+    float* z_acc
 );
 
 #endif
