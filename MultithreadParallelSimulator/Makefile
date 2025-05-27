@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -O3 -std=c++17 -fopenmp -DDEBUG
+CXXFLAGS = -Wall -Wextra -O3 -std=c++17 -fopenmp
 DEBUG_FLAGS = -Wall -Wextra -O3 -std=c++17 -DDEBUG -fopenmp -g
 LDFLAGS += -Isrc/include
 
