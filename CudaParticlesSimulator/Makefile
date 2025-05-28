@@ -7,23 +7,20 @@ OUT_DIR := out
 LOAD_DIR := ..
 GEN_DIR := ../utils
 
-LOADLEVELS := low medium high
+LOADLEVELS := low medium high higher
 THREADSBLOCK := 32 64 128 256 512 1024
-VERSIONS := 0 1 2 3
+VERSIONS := 0 1 2 3 4 5
 
-EPOCHS_higher := 1
-EPOCHS_high := 1 
-EPOCHS_medium := 1
-EPOCHS_low := 1
-PARTICLENUM_higher := 61440
+EPOCHS := 4
+PARTICLENUM_higher := 60000
 PARTICLENUM_high := 20000
 PARTICLENUM_medium := 5000
 PARTICLENUM_low := 100
 
 COMPUTE_CAPABILITY := $(shell if command -v nvidia-smi >/dev/null 2>&1; then nvidia-smi --query-gpu=compute_cap --format=csv,noheader | head -n 1 | sed 's/\.//g'; else echo 75; fi)
 NVCC := nvcc
-NVCCFLAGS := -gencode arch=compute_$(COMPUTE_CAPABILITY),code=sm_$(COMPUTE_CAPABILITY) -O3 -Wno-deprecated-gpu-targets -use_fast_math -lineinfo
-# DEBUG_FLAGS = -Wall -Wextra -O3 -std=c++17 -DDEBUG -fopenmp -g
+NVCCFLAGS := -gencode arch=compute_$(COMPUTE_CAPABILITY),code=sm_$(COMPUTE_CAPABILITY) -O3 -Wno-deprecated-gpu-targets -lineinfo
+EXTRA_NVCCFLAGS = $(if $(filter 4 5,$(version)),-use_fast_math,)
 LDFLAGS += -I$(SRC_DIR)/include
 
 SOURCES = $(wildcard $(SRC_DIR)/*.cu)
@@ -54,7 +51,7 @@ $(BIN_DIR)/main_%: $(SOURCES) $(HEADERS)
 	$(eval threads := $(word 2,$(PARAMS)))
 	$(eval version := $(word 3,$(PARAMS)))
 
-	$(NVCC) $(NVCCFLAGS) -o $@ $(SOURCES) $(LDFLAGS) -DPARTICLE_NUM=$(PARTICLENUM_$(level)) -DDURATION=$(EPOCHS_$(level)) -DTHREADS_PER_BLOCK=$(threads) -DVERSION=$(version)
+	$(NVCC) $(NVCCFLAGS) $(EXTRA_NVCCFLAGS) -o $@ $(SOURCES) $(LDFLAGS) -DPARTICLE_NUM=$(PARTICLENUM_$(level)) -DDURATION=$(EPOCHS) -DTHREADS_PER_BLOCK=$(threads) -DVERSION=$(version)
 
 clean:
 	rm -f $(OBJECTS) $(TARGETS) $(OUTPUT_FILES) $(ERROR_FILES) $(TIME_FILES) bin/main_*
@@ -74,4 +71,4 @@ test: $(TESTS)
 
 # low medium high
 generate_%: $(GEN_DIR)/generate_config.py
-	python3 $< -e $(EPOCHS_$*) -p $(PARTICLENUM_$*) -o $(LOAD_DIR)/$*.txt
+	python3 $< -e $(EPOCHS) -p $(PARTICLENUM_$*) -o $(LOAD_DIR)/$*.txt
