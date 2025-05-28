@@ -3,7 +3,7 @@
 #include <fstream>
 
 #define THREAD_NUM 12
-#define CHUNK_SIZE 2048
+#define CHUNK_SIZE 250
 
 using namespace std;
 
