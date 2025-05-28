@@ -2,6 +2,17 @@
 
 void particle::calcAcceleration(const particle particle, float3& acceleration) const {
 
+#ifdef FAST
+    float dx = particle.position.x - this->position.x;
+    float dy = particle.position.y - this->position.y;
+    float dz = particle.position.z - this->position.z;
+    float dist = sqrt(dx * dx + dy * dy + dz * dz + EPS * EPS);
+
+    float partial = particle.mass / (dist*dist*dist);
+    acceleration.x += dx * partial;
+    acceleration.y += dy * partial;
+    acceleration.z += dz * partial;
+#else
     float dist = sqrt(
             (particle.position.x - this->position.x) * (particle.position.x - this->position.x) +
             (particle.position.y - this->position.y) * (particle.position.y - this->position.y) +
@@ -12,6 +23,7 @@ void particle::calcAcceleration(const particle particle, float3& acceleration) c
     acceleration.x += G * particle.mass * (particle.position.x - this->position.x) / (dist*dist*dist);
     acceleration.y += G * particle.mass * (particle.position.y - this->position.y) / (dist*dist*dist);
     acceleration.z += G * particle.mass * (particle.position.z - this->position.z) / (dist*dist*dist);
+#endif
 
 }
 

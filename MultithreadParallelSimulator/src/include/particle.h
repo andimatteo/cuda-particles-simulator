@@ -13,6 +13,8 @@
     #define STEP_TIME 0.01f
 #endif
 
+#define FAST
+
 #include <fstream>
 #include <cmath>
 using namespace std;
