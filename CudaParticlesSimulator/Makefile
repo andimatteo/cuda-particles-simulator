@@ -65,7 +65,8 @@ test_%: $(BIN_DIR)/main_%
 	$(eval threads := $(word 2,$(PARAMS)))
 	$(eval version := $(word 3,$(PARAMS)))
 
-	./$< $(OUT_DIR)/time.txt < $(LOAD_DIR)/$(level).txt > $(OUT_DIR)/output_$(level)_$(threads)_$(version).txt 2> $(OUT_DIR)/error_$(level)_$(threads)_$(version).txt
+	./$< $(OUT_DIR)/time.txt < $(LOAD_DIR)/$(level).txt
+# > $(OUT_DIR)/output_$(level)_$(threads)_$(version).txt 2> $(OUT_DIR)/error_$(level)_$(threads)_$(version).txt
 
 test: $(TESTS)
 	@echo "All tests completed."

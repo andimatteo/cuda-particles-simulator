@@ -75,7 +75,7 @@ int main_0_1(ofstream &time_stream) {
         cudaEventElapsedTime(&milliseconds, start, stop);
         // print the time taken for this iteration
         time_stream << VERSION << " " << THREADS_PER_BLOCK << " " << PARTICLE_NUM << " " << iter << ": " << milliseconds << "ms" << endl;
-
+#ifdef DEBUG
         for (int particle = 0; particle < PARTICLE_NUM; particle++) {
             cout << h_particles[particle].pos.x << " "
                 << h_particles[particle].pos.y << " "
@@ -83,7 +83,7 @@ int main_0_1(ofstream &time_stream) {
                 << endl;
         }
         cout << endl;
-        // also velocities?
+#endif
     }
 
     // Free memory
@@ -212,6 +212,7 @@ int main_2_3(ofstream &time_stream) {
         // print the time taken for this iteration
         time_stream << VERSION << " " << THREADS_PER_BLOCK << " " << PARTICLE_NUM << " " << iter << ": " << milliseconds << "ms" << endl;
 
+#ifdef DEBUG
         for (int particle = 0; particle < PARTICLE_NUM; particle++) {
             cout << h_x_pos[particle] << " "
                 << h_y_pos[particle] << " "
@@ -219,6 +220,7 @@ int main_2_3(ofstream &time_stream) {
                 << endl;
         }
         cout << endl;
+#endif
     }
 
     // Free memory
@@ -369,7 +371,7 @@ int main_4_5(ofstream &time_stream) {
 
         // print the time taken for this iteration
         time_stream << VERSION << " " << THREADS_PER_BLOCK << " " << PARTICLE_NUM << " " << iter << ": " << milliseconds << "ms" << endl;        
-
+#ifdef DEBUG
         for (int particle = 0; particle < PARTICLE_NUM; particle++) {
             cout << h_x_pos[particle] << " "
                 << h_y_pos[particle] << " "
@@ -377,7 +379,7 @@ int main_4_5(ofstream &time_stream) {
                 << endl;
         }
         cout << endl;
-        // also velocities?
+#endif
     }
 
     // Free memory
