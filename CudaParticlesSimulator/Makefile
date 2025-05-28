@@ -7,15 +7,14 @@ OUT_DIR := out
 LOAD_DIR := ..
 GEN_DIR := ../utils
 
-LOADLEVELS := low medium high higher
+LOADLEVELS := low medium high
 THREADSBLOCK := 32 64 128 256 512 1024
 VERSIONS := 0 1 2 3 4 5
 
-EPOCHS := 4
-PARTICLENUM_higher := 60000
-PARTICLENUM_high := 20000
-PARTICLENUM_medium := 5000
-PARTICLENUM_low := 100
+EPOCHS := 30
+PARTICLENUM_high := 60000
+PARTICLENUM_medium := 16000
+PARTICLENUM_low := 2000
 
 COMPUTE_CAPABILITY := $(shell if command -v nvidia-smi >/dev/null 2>&1; then nvidia-smi --query-gpu=compute_cap --format=csv,noheader | head -n 1 | sed 's/\.//g'; else echo 75; fi)
 NVCC := nvcc

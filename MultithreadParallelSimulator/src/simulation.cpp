@@ -138,6 +138,12 @@ void chunkSimulation::start_simulation(){
 
 void simulation::save_state(double t0, double t1, int it, const std::string& filename) const {
     ofstream out(filename, std::ios::out | std::ios::app);
-    out << version << "_" << it << ':' << t1 - t0 << endl;
+    out << version << " " << THREAD_NUM << " " << CHUNK_SIZE << " " 
+    #ifdef FAST
+        << "F"
+    #else
+        << "S"
+    #endif
+        << " " << particleNum << " " << it << ':' << t1 - t0 << endl;
 }
 
