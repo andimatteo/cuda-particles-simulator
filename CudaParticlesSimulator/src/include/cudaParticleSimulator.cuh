@@ -3,6 +3,7 @@
 
 #include "Particle.cuh"
 #include <cuda.h>
+#include <math.h>
 
 #ifndef VERSION
     #define VERSION 0
