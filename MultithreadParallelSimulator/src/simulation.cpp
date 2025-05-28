@@ -1,11 +1,12 @@
 #include "simulation.h"
 #include <omp.h>
 
-simulation::simulation(int duration, int particleNum){
+simulation::simulation(int duration, int particleNum, int version){
     this->particleNum = particleNum;
     this->duration = duration;
     this->particles = new particle[particleNum];
     this->oldParticles = new particle[particleNum];
+    this->version = version;
 }
 
 void simulation::load_particles(){
@@ -22,6 +23,9 @@ simulation::~simulation(){
 
 void sequentialSimulation::start_simulation(){
     for (int t = 0; t < duration; ++t){
+
+        double t0 = omp_get_wtime();
+
         for (int i = 0; i < particleNum; ++i){
             float3 acceleration = {0.0f,0.0f,0.0f};
             for (int j = 0; j < particleNum; ++j) {
@@ -30,6 +34,10 @@ void sequentialSimulation::start_simulation(){
             }
             oldParticles[i].newState(particles[i], acceleration);
         }
+        
+        double t1 = omp_get_wtime();
+
+        save_state(t0,t1,t);
 #ifdef DEBUG
         for (int i = 0; i < particleNum; ++i){
             cout << particles[i] << endl;
@@ -42,7 +50,9 @@ void sequentialSimulation::start_simulation(){
 
 void parallelSimulation::start_simulation(){
     for (int t = 0; t < duration; ++t){
-        
+ 
+        double t0 = omp_get_wtime();
+
         # pragma omp parallel for schedule(static) num_threads(THREAD_NUM) proc_bind(close) shared(particles, oldParticles, particleNum, duration)
         for (int i = 0; i < particleNum; ++i){
             float3 acceleration = {0.0f,0.0f,0.0f};
@@ -53,6 +63,9 @@ void parallelSimulation::start_simulation(){
             oldParticles[i].newState(particles[i], acceleration);
         }
 
+        double t1 = omp_get_wtime();
+
+        save_state(t0,t1,t);
 #ifdef DEBUG
         for (int i = 0; i < particleNum; ++i){
             cout << particles[i] << endl;
@@ -66,6 +79,8 @@ void parallelSimulation::start_simulation(){
 void chunkSimulation::start_simulation(){
     
     for (int t = 0; t < duration; ++t){
+
+        double t0 = omp_get_wtime();
 
         # pragma omp parallel for schedule(static) num_threads(THREAD_NUM) proc_bind(close) shared(particles, oldParticles, particleNum, duration)
         for (int i = 0; i < particleNum; i += CHUNK_SIZE){
@@ -88,6 +103,11 @@ void chunkSimulation::start_simulation(){
             }
         }
 
+        
+        double t1 = omp_get_wtime();
+        
+
+        save_state(t0,t1,t);
 #ifdef DEBUG
         for (int i = 0; i < particleNum; ++i){
             cout << particles[i] << endl;
@@ -96,5 +116,11 @@ void chunkSimulation::start_simulation(){
 #endif
 
     }
+}
+
+
+void simulation::save_state(double t0, double t1, int it, const std::string& filename) const {
+    ofstream out(filename, std::ios::out | std::ios::trunc);
+    out << version << "_" << it << ':' << t1 - t0 << endl;
 }
 
