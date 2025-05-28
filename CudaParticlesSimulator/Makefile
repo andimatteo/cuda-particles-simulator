@@ -38,6 +38,8 @@ OUTPUT_FILES = $(wildcard $(OUT_DIR)/output*.txt)
 ERROR_FILES = $(wildcard $(OUT_DIR)/error*.txt)
 TIME_FILES = $(wildcard $(OUT_DIR)/time*.txt)
 
+NSIGHT := /usr/local/NVIDIA-Nsight-Compute-2025.2/target/linux-desktop-glibc_2_11_3-x64/ncu
+REPORT = "/home/taulant/Documents/NVIDIA Nsight Compute/cuda-particles-simulator/report_$(level)_$(threads)_$(version)_%i"
 
 .PHONY: all clean test
 
@@ -57,7 +59,7 @@ clean:
 	rm -f $(OBJECTS) $(TARGETS) $(OUTPUT_FILES) $(ERROR_FILES) $(TIME_FILES) bin/main_*
 
 test_%: $(BIN_DIR)/main_%
-# Retrieve parameters from target name: main_<level>_<threads>_<version>
+# Retrieve parameters from target name: test_<level>_<threads>_<version>
 	$(eval PARAMS_ := $(patsubst test_%,%,$@))
 	$(eval PARAMS = $(subst _, ,$(PARAMS_)))
 	$(eval level := $(word 1,$(PARAMS)))
@@ -68,6 +70,16 @@ test_%: $(BIN_DIR)/main_%
 
 test: $(TESTS)
 	@echo "All tests completed."
+
+nsight_%: $(BIN_DIR)/main_%
+# Retrieve parameters from target name: nsight_<level>_<threads>_<version>
+	$(eval PARAMS_ := $(patsubst nsight_%,%,$@))
+	$(eval PARAMS = $(subst _, ,$(PARAMS_)))
+	$(eval level := $(word 1,$(PARAMS)))
+	$(eval threads := $(word 2,$(PARAMS)))
+	$(eval version := $(word 3,$(PARAMS)))
+
+	sudo $(NSIGHT) --config-file off --export $(REPORT) --force-overwrite --set full $< $(OUT_DIR)/time.txt < $(LOAD_DIR)/$(level).txt
 
 # low medium high
 generate_%: $(GEN_DIR)/generate_config.py
