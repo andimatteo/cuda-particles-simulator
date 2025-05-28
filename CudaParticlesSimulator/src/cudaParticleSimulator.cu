@@ -1,11 +1,11 @@
 #include "cudaParticleSimulator.cuh"
 
 #if VERSION == 0
-    #define EPS 1e-10
+    #define EPS 1e-1
     #define G 6.674e-11
     #define STEP_TIME 86400.0
 #else
-    #define EPS 1e-10f
+    #define EPS 1e-1f
     #define G 6.674e-11f
     #define STEP_TIME 86400.0f
 #endif
@@ -401,6 +401,10 @@ __global__ void newState_5(
         // synchronize threads to ensure all data of the tile has been processed
         __syncthreads();
     }
+
+    x_acc *= G;
+    y_acc *= G;
+    z_acc *= G;
 
     // update the velocity and position of the current particle
     x_vel_new[idx] = fmaf(x_acc, STEP_TIME, thread_x_vel_old);
